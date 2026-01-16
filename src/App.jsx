@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { analytics } from './firebase';
 import { logEvent } from 'firebase/analytics';
 import { INITIAL_LOCATIONS, COLORS, MESSAGES, THEMES } from './constants';
@@ -148,6 +148,7 @@ function App() {
   const [showBanner, setShowBanner] = useState(false);
   const [isKakao, setIsKakao] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showAllMenu, setShowAllMenu] = useState(false);
   const [activeTab, setActiveTab] = useState('home'); // 'home', 'map', 'insights', 'settings'
 
   // Analytics: Track screen views on tab change
@@ -626,19 +627,79 @@ function App() {
         </motion.div>
       </div >
 
+      {/* Bottom Sheet Menu */}
+      <AnimatePresence>
+        {showAllMenu && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[5000]"
+              onClick={() => setShowAllMenu(false)}
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-3xl rounded-t-[2.5rem] p-6 z-[6000] border-t border-white/10 pb-12 safe-area-bottom shadow-2xl"
+            >
+              <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-8" />
+
+              <h3 className="text-white/50 text-xs font-bold mb-4 ml-1">전체 메뉴</h3>
+              <div className="grid grid-cols-4 gap-4">
+                <button
+                  onClick={() => { setActiveTab('fishing'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">🎣</div>
+                  <span className="text-xs font-medium text-white">낚시</span>
+                </button>
+                <button
+                  onClick={() => { setActiveTab('insights'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">📊</div>
+                  <span className="text-xs font-medium text-white">분석</span>
+                </button>
+
+                {/* Future Features (Coming Soon) */}
+                <button className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 opacity-40 grayscale">
+                  <div className="text-3xl">🏔️</div>
+                  <span className="text-xs font-medium text-white">오름(예정)</span>
+                </button>
+                <button className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 opacity-40 grayscale">
+                  <div className="text-3xl">🚗</div>
+                  <span className="text-xs font-medium text-white">교통(예정)</span>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* Bottom Navigation */}
-      < div className="fixed bottom-0 left-0 right-0 p-4 z-[4000] pointer-events-none" >
+      <div className="fixed bottom-0 left-0 right-0 p-4 z-[4000] pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
-          <div className="glass-premium glass-border rounded-[2.5rem] p-2 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-3xl overflow-x-auto">
+          <div className="glass-premium glass-border rounded-[2.5rem] p-2 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-3xl">
             <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon="🏠" label="홈" />
             <NavButton active={activeTab === 'map'} onClick={() => setActiveTab('map')} icon="🗺️" label="공기맵" />
+
+            <div className="relative -top-5">
+              <button
+                onClick={() => setShowAllMenu(true)}
+                className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-2xl shadow-lg border-4 border-[#1a1f2c] active:scale-95 transition-all"
+              >
+                <span className="filter drop-shadow-md text-white">🧊</span>
+              </button>
+            </div>
+
             <NavButton active={activeTab === 'cctv'} onClick={() => setActiveTab('cctv')} icon="📹" label="CCTV" />
-            <NavButton active={activeTab === 'insights'} onClick={() => setActiveTab('insights')} icon="📊" label="분석" />
-            <NavButton active={activeTab === 'fishing'} onClick={() => setActiveTab('fishing')} icon="🎣" label="낚시" />
             <NavButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon="✨" label="더보기" />
           </div>
         </div>
-      </div >
+      </div>
       <ShareModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
