@@ -1,0 +1,47 @@
+{
+    "functions": {
+        "source": "functions"
+    },
+    "hosting": {
+        "public": "dist",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ],
+        "rewrites": [
+            {
+                "source": "/api/air",
+                "function": "getAirKoreaQuality"
+            },
+            {
+                "source": "/api/weather",
+                "function": "getKmaWeather"
+            },
+            {
+                "source": "/api/reverse-geocode",
+                "function": "getReverseGeocode"
+            },
+            {
+                "source": "/api/airport-weather",
+                "function": "getJejuAirportWeather"
+            },
+            {
+                "source": "/api/sea-trip",
+                "function": "getSeaTripIndex"
+            },
+            {
+                "source": "/api/fishing",
+                "function": "getSeaFishingIndex"
+            },
+            {
+                "source": "/api/flights",
+                "function": "getJejuFlights"
+            },
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ]
+    }
+}
