@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import TiltCard from './TiltCard';
+import SupportButton from './SupportButton';
 import { COLORS } from '../constants';
 
 export default function FishingTab({ seaTripData, seaFishingData, loading }) {
@@ -78,9 +79,12 @@ export default function FishingTab({ seaTripData, seaFishingData, loading }) {
         <div className="flex-1 overflow-y-auto pt-6 px-6 pb-24 text-white z-10 scroll-smooth bg-slate-900/50">
             {/* Header */}
             <div className="mb-6">
-                <h2 className="text-3xl font-black text-white flex items-center gap-3">
-                    <span className="text-4xl">🎣</span> 제주 낚시
-                </h2>
+                <div className="flex items-center justify-between">
+                    <h2 className="text-3xl font-black text-white flex items-center gap-3">
+                        <span className="text-4xl">🎣</span> 제주 낚시
+                    </h2>
+                    <SupportButton />
+                </div>
                 <p className="text-white/60 text-sm mt-1">물때와 파고 확인하고 안전하게 즐기세요.</p>
             </div>
 

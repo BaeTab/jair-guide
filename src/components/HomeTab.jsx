@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import TiltCard from './TiltCard';
 import DataCard from './DataCard';
+import SupportButton from './SupportButton';
 import { getHealthTips, getStyleRecommendation } from '../utils';
 import { JEJU_DIALECTS } from '../constants';
 
@@ -25,16 +26,19 @@ export default function HomeTab({
                     <span className="text-2xl">🍃</span>
                     <span className="text-lg font-bold tracking-tight">제주바람</span>
                 </div>
-                <button
-                    onClick={() => setShowShareModal(true)}
-                    className="p-2.5 rounded-2xl glass-premium glass-border text-white active:scale-95 flex items-center gap-2 transition-all shadow-xl"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 drop-shadow-sm">
-                        <path d="M12 9a3.75 3.75 0 1 0 0 7.5A3.75 3.75 0 0 0 12 9Z" />
-                        <path fillRule="evenodd" d="M9.344 3.071a49.52 49.52 0 0 1 5.312 0c.967.052 1.83.585 2.332 1.39l.821 1.317c.24.383.645.643 1.11.71.386.054.77.113 1.152.177 1.432.239 2.429 1.493 2.429 2.909V18a3 3 0 0 1-3 3h-15a3 3 0 0 1-3-3V9.574c0-1.416.997-2.67 2.429-2.909.382-.064.766-.123 1.151-.178a1.56 1.56 0 0 0 1.11-.71l.822-1.315a2.742 2.742 0 0 1 2.332-1.39ZM9 12.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0Z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-[11px] font-black tracking-tight">카드 생성</span>
-                </button>
+                <div className="flex items-center gap-2">
+                    <SupportButton />
+                    <button
+                        onClick={() => setShowShareModal(true)}
+                        className="p-2.5 rounded-2xl glass-premium glass-border text-white active:scale-95 flex items-center gap-2 transition-all shadow-xl"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 drop-shadow-sm">
+                            <path d="M12 9a3.75 3.75 0 1 0 0 7.5A3.75 3.75 0 0 0 12 9Z" />
+                            <path fillRule="evenodd" d="M9.344 3.071a49.52 49.52 0 0 1 5.312 0c.967.052 1.83.585 2.332 1.39l.821 1.317c.24.383.645.643 1.11.71.386.054.77.113 1.152.177 1.432.239 2.429 1.493 2.429 2.909V18a3 3 0 0 1-3 3h-15a3 3 0 0 1-3-3V9.574c0-1.416.997-2.67 2.429-2.909.382-.064.766-.123 1.151-.178a1.56 1.56 0 0 0 1.11-.71l.822-1.315a2.742 2.742 0 0 1 2.332-1.39ZM9 12.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0Z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-[11px] font-black tracking-tight">카드 생성</span>
+                    </button>
+                </div>
             </div>
 
             <div className="flex justify-between items-start mb-6">
@@ -85,6 +89,37 @@ export default function HomeTab({
                     ))}
                 </div>
             </div>
+
+            {/* Realtime Weather Bar */}
+            {currentData && (
+                <div className="mb-8 grid grid-cols-3 gap-3 px-2">
+                    <div className="glass-card glass-border rounded-2xl p-3 flex flex-col items-center justify-center text-center shadow-lg">
+                        <span className="text-2xl mb-1 drop-shadow-sm">🌡️</span>
+                        <span className="text-[10px] text-white/50 font-bold mb-0.5">기온</span>
+                        <span className="text-lg font-black text-white tracking-tight">{currentData.temp}°</span>
+                        <span className="text-[9px] text-white/30">체감 {currentData.feelTemp}°</span>
+                    </div>
+                    <div className="glass-card glass-border rounded-2xl p-3 flex flex-col items-center justify-center text-center shadow-lg">
+                        <span className="text-2xl mb-1 drop-shadow-sm">💧</span>
+                        <span className="text-[10px] text-white/50 font-bold mb-0.5">습도</span>
+                        <span className="text-lg font-black text-blue-200 tracking-tight">{currentData.humidity}%</span>
+                        <span className="text-[9px] text-white/30">{currentData.rainAmt > 0 ? `${currentData.rainAmt}mm` : '강수없음'}</span>
+                    </div>
+                    <div className="glass-card glass-border rounded-2xl p-3 flex flex-col items-center justify-center text-center shadow-lg">
+                        <span className="text-2xl mb-1 drop-shadow-sm">😷</span>
+                        <span className="text-[10px] text-white/50 font-bold mb-0.5">미세먼지</span>
+                        <span className={`text-lg font-black tracking-tight ${currentData.pm10 <= 30 ? 'text-emerald-300' :
+                                currentData.pm10 <= 80 ? 'text-yellow-300' :
+                                    currentData.pm10 <= 150 ? 'text-orange-300' : 'text-red-300'
+                            }`}>
+                            {currentData.pm10 <= 30 ? '좋음' :
+                                currentData.pm10 <= 80 ? '보통' :
+                                    currentData.pm10 <= 150 ? '나쁨' : '최악'}
+                        </span>
+                        <span className="text-[9px] text-white/30">{currentData.pm10}㎍/㎥</span>
+                    </div>
+                </div>
+            )}
 
             {/* OOTD & Hair Style Card (New Feature) */}
             {currentData && (

@@ -5,10 +5,15 @@ const cors = require("cors")({ origin: true });
 const moment = require("moment-timezone");
 const proj4 = require("proj4");
 
+// Load environment variables from .env file
+require("dotenv").config();
+
 admin.initializeApp();
 
-// KMA API Service Key (Decoding Key)
-const SERVICE_KEY = "LTVNqKiagRvNnUDX7RDV+7JYziYS7VrhQk6u86ts1ecct1QoAevL5RQkE1Osgj3B+FZUG0oA6BkrAn+Ge2LzwQ==";
+// API Keys from environment variables (set via Firebase Functions config)
+// Set with: firebase functions:config:set kma.service_key="YOUR_KEY"
+// Or use .env file with functions.config() or process.env
+const SERVICE_KEY = process.env.KMA_SERVICE_KEY || functions.config().kma?.service_key || "";
 const CLEAN_SERVICE_KEY = (function () {
     try {
         return decodeURIComponent(SERVICE_KEY);

@@ -3,7 +3,7 @@ import { THEMES } from '../constants';
 
 export default function SettingsTab({ currentThemeId, setCurrentThemeId, currentTheme }) {
     return (
-        <div className="p-6 text-white pb-32">
+        <div className="flex-1 overflow-y-auto p-6 text-white pb-32">
             <h2 className="text-2xl font-black mb-1">더보기</h2>
             <p className="text-white/60 text-xs mb-8">앱 설정 및 제주바람 정보</p>
 
@@ -33,7 +33,10 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
             </div>
 
             <div className="space-y-4">
-                <div className="glass-card glass-border rounded-3xl p-6 flex items-center justify-between shadow-xl">
+                <a
+                    href="mailto:b_h_woo@naver.com"
+                    className="glass-card glass-border rounded-3xl p-6 flex items-center justify-between shadow-xl hover:bg-white/10 transition-all group"
+                >
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center text-2xl shadow-inner">👤</div>
                         <div>
@@ -41,29 +44,65 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
                             <p className="text-[10px] text-white/40 font-medium">Bae Hyun-woo</p>
                         </div>
                     </div>
-                    <div className={`text-xs font-black ${currentTheme.colors.accent}`}>Contact</div>
-                </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-white/30">b_h_woo@naver.com</span>
+                        <div className={`text-xs font-black ${currentTheme.colors.accent} group-hover:translate-x-1 transition-transform`}>✉️</div>
+                    </div>
+                </a>
 
                 <div className="glass-card glass-border rounded-3xl p-6 flex items-center justify-between shadow-xl">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center text-2xl shadow-inner">📦</div>
                         <div>
-                            <h4 className="font-black text-sm">업데이트 확인</h4>
-                            <p className="text-[10px] text-white/40 font-medium">v1.3.0 (Theme Edition)</p>
+                            <h4 className="font-black text-sm">앱 버전</h4>
+                            <p className="text-[10px] text-white/40 font-medium">v1.4.0 (CCTV & HLS Proxy)</p>
                         </div>
                     </div>
-                    <div className="text-xs text-white/20 font-black tracking-widest">LATEST</div>
+                    <div className="text-xs text-emerald-400 font-black tracking-widest">✓ LATEST</div>
                 </div>
 
-                <div className="glass-card glass-border rounded-3xl p-6 flex items-center justify-between shadow-xl">
-                    <div className="flex items-center gap-4">
+                <div className="glass-card glass-border rounded-3xl p-6 shadow-xl">
+                    <div className="flex items-center gap-4 mb-4">
                         <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center text-2xl shadow-inner">🛰️</div>
                         <div>
                             <h4 className="font-black text-sm">데이터 출처</h4>
-                            <p className="text-[10px] text-white/40 font-medium whitespace-pre-wrap">Open-Meteo & OpenStreetMap</p>
+                            <p className="text-[10px] text-white/40 font-medium">공공 API 및 오픈소스 활용</p>
                         </div>
                     </div>
+                    <div className="grid grid-cols-2 gap-2 text-[9px] text-white/50">
+                        <div className="bg-white/5 rounded-lg p-2">☁️ 기상청 (KMA)</div>
+                        <div className="bg-white/5 rounded-lg p-2">💨 에어코리아</div>
+                        <div className="bg-white/5 rounded-lg p-2">🌊 국립해양조사원</div>
+                        <div className="bg-white/5 rounded-lg p-2">✈️ OpenSky Network</div>
+                        <div className="bg-white/5 rounded-lg p-2">📹 제주 재난안전본부</div>
+                        <div className="bg-white/5 rounded-lg p-2">🗺️ OpenStreetMap</div>
+                    </div>
                 </div>
+
+                {/* Buy Me a Coffee */}
+                <a
+                    href="https://buymeacoffee.com/bhwoo484"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block glass-card glass-border rounded-3xl p-6 shadow-xl hover:bg-white/10 transition-all duration-300 group"
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                ☕
+                            </div>
+                            <div>
+                                <h4 className="font-black text-sm">제주바람 응원하기</h4>
+                                <p className="text-[10px] text-white/40 font-medium">커피 한 잔으로 개발자를 응원해주세요 ❤️</p>
+                            </div>
+                        </div>
+                        <div className="text-yellow-400 group-hover:translate-x-1 transition-transform">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </div>
+                    </div>
+                </a>
 
                 <div className="pt-8 flex flex-col items-center gap-4">
                     <div className="w-16 h-16 glass-premium glass-border rounded-2xl flex items-center justify-center text-3xl shadow-2xl opacity-50">🍃</div>

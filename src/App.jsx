@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { analytics } from './firebase';
+import { logEvent } from 'firebase/analytics';
 import { INITIAL_LOCATIONS, COLORS, MESSAGES, THEMES } from './constants';
 import { getWeather, getStatus, getTravelIndex, calculateHallaIndex, getJejuActivity, getLifestyleTips, calculateRadarStats } from './utils';
 import ShareModal from './components/ShareModal';
@@ -147,6 +149,16 @@ function App() {
   const [isKakao, setIsKakao] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState('home'); // 'home', 'map', 'insights', 'settings'
+
+  // Analytics: Track screen views on tab change
+  useEffect(() => {
+    if (analytics) {
+      logEvent(analytics, 'screen_view', {
+        firebase_screen: activeTab,
+        screen_name: activeTab
+      });
+    }
+  }, [activeTab]);
   const [currentThemeId, setCurrentThemeId] = useState(localStorage.getItem('jeju-air-theme') || 'ocean');
   const [airportWeather, setAirportWeather] = useState(null);
   const [seaTripData, setSeaTripData] = useState(null);
@@ -617,12 +629,13 @@ function App() {
       {/* Bottom Navigation */}
       < div className="fixed bottom-0 left-0 right-0 p-4 z-[4000] pointer-events-none" >
         <div className="max-w-md mx-auto pointer-events-auto">
-          <div className="glass-premium glass-border rounded-[2.5rem] p-2 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-3xl">
+          <div className="glass-premium glass-border rounded-[2.5rem] p-2 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-3xl overflow-x-auto">
             <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon="🏠" label="홈" />
             <NavButton active={activeTab === 'map'} onClick={() => setActiveTab('map')} icon="🗺️" label="공기맵" />
             <NavButton active={activeTab === 'cctv'} onClick={() => setActiveTab('cctv')} icon="📹" label="CCTV" />
+            <NavButton active={activeTab === 'insights'} onClick={() => setActiveTab('insights')} icon="📊" label="분석" />
             <NavButton active={activeTab === 'fishing'} onClick={() => setActiveTab('fishing')} icon="🎣" label="낚시" />
-            <NavButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon="✨" label="테마" />
+            <NavButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon="✨" label="더보기" />
           </div>
         </div>
       </div >

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Hls from 'hls.js';
+import SupportButton from './SupportButton';
 
 // 제주도 CCTV 데이터 - 실제 작동하는 스트림 URL (25개+)
 // 출처: hallasan-moa.kr (제주특별자치도 재난안전본부 CCTV)
@@ -226,8 +227,11 @@ export default function CctvTab() {
                         <h1 className="text-2xl font-black text-white">제주 CCTV</h1>
                         <p className="text-white/60 text-sm">실시간 제주도 현장 영상 ({CCTV_DATA.length}개)</p>
                     </div>
-                    <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-2xl">
-                        📹
+                    <div className="flex items-center gap-2">
+                        <SupportButton />
+                        <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-2xl">
+                            📹
+                        </div>
                     </div>
                 </div>
 

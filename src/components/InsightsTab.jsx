@@ -2,6 +2,7 @@ import React from 'react';
 import TiltCard from './TiltCard';
 import DataCard from './DataCard';
 import RadarChart from './RadarChart';
+import SupportButton from './SupportButton';
 import { getWindDesc, getWeather, getPmStatus } from '../utils';
 
 export default function InsightsTab({ currentData, loading }) {
@@ -10,7 +11,10 @@ export default function InsightsTab({ currentData, loading }) {
 
     return (
         <div className="flex-1 overflow-y-auto p-6 pb-32 text-white">
-            <h2 className="text-2xl font-black mb-1">상세 대기 리포트</h2>
+            <div className="flex items-center justify-between mb-1">
+                <h2 className="text-2xl font-black">상세 대기 리포트</h2>
+                <SupportButton />
+            </div>
             <p className="text-white/60 text-xs mb-8">실시간으로 분석된 제주의 공기 분석표입니다.</p>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
@@ -64,9 +68,9 @@ export default function InsightsTab({ currentData, loading }) {
                     <div className="text-4xl font-black">{currentData?.uvIndex !== undefined ? currentData.uvIndex : '-'}</div>
                     {currentData?.uvIndex !== undefined && (
                         <div className={`px-3 py-1 rounded-full text-[10px] font-black border mb-1 ${currentData.uvIndex <= 2 ? 'bg-emerald-500/30 text-emerald-300 border-emerald-500/20' :
-                                currentData.uvIndex <= 5 ? 'bg-yellow-500/30 text-yellow-300 border-yellow-500/20' :
-                                    currentData.uvIndex <= 7 ? 'bg-orange-500/30 text-orange-300 border-orange-500/20' :
-                                        'bg-red-500/30 text-red-300 border-red-500/20'
+                            currentData.uvIndex <= 5 ? 'bg-yellow-500/30 text-yellow-300 border-yellow-500/20' :
+                                currentData.uvIndex <= 7 ? 'bg-orange-500/30 text-orange-300 border-orange-500/20' :
+                                    'bg-red-500/30 text-red-300 border-red-500/20'
                             }`}>
                             {currentData.uvIndex <= 2 ? '낮음' :
                                 currentData.uvIndex <= 5 ? '보통' :
