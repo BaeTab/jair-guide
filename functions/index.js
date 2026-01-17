@@ -1189,32 +1189,6 @@ exports.getPharmacy = functions.https.onRequest((req, res) => {
 });
 
 // Jeju Public Wifi API Proxy
-exports.getWifi = functions.https.onRequest((req, res) => {
-    cors(req, res, async () => {
-        try {
-            const { number = 1, limit = 100 } = req.query;
-            const projectKey = "4343_o3b3o8r23o0jcb32r53b3cet082";
-            const apiUrl = `https://open.jejudatahub.net/api/proxy/Dtb18ta1btbD1Da1a81aaDttab6tDabb/${projectKey}`;
-
-            const response = await axios.get(apiUrl, {
-                params: {
-                    number: number,
-                    limit: limit
-                },
-                timeout: 10000
-            });
-
-            res.status(200).json(response.data);
-        } catch (error) {
-            console.error("Wifi API Error:", error.message);
-            if (error.response) {
-                console.error("Error Data:", JSON.stringify(error.response.data));
-                console.error("Error Status:", error.response.status);
-            }
-            res.status(500).json({ error: "Failed to fetch Wifi data", details: error.message });
-        }
-    });
-});
 // Scheduled function to check for Jeju Weather Alerts every 30 minutes
 exports.checkJejuWeatherAlerts = onSchedule('every 30 minutes', async (event) => {
     try {

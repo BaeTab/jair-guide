@@ -17,7 +17,6 @@ const SettingsTab = React.lazy(() => import('./components/SettingsTab'));
 const CctvTab = React.lazy(() => import('./components/CctvTab'));
 const CleanHouseTab = React.lazy(() => import('./components/CleanHouseTab'));
 const PharmacyTab = React.lazy(() => import('./components/PharmacyTab'));
-const WifiTab = React.lazy(() => import('./components/WifiTab'));
 const StoneTowerTab = React.lazy(() => import('./components/StoneTowerTab'));
 
 // --- Configuration & Constants ---
@@ -679,10 +678,6 @@ function App() {
               <PharmacyTab />
             )}
 
-            {activeTab === 'wifi' && (
-              <WifiTab />
-            )}
-
             {activeTab === 'settings' && (
               <SettingsTab
                 currentThemeId={currentThemeId}
@@ -785,13 +780,6 @@ function App() {
                 >
                   <div className="text-3xl filter drop-shadow-lg">💊</div>
                   <span className="text-xs font-medium text-white">약국</span>
-                </button>
-                <button
-                  onClick={() => { setActiveTab('wifi'); setShowAllMenu(false); }}
-                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
-                >
-                  <div className="text-3xl filter drop-shadow-lg">📶</div>
-                  <span className="text-xs font-medium text-white">와이파이</span>
                 </button>
 
                 <button

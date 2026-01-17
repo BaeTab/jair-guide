@@ -50,10 +50,6 @@
                 "function": "getPharmacy"
             },
             {
-                "source": "/api/wifi",
-                "function": "getWifi"
-            },
-            {
                 "source": "/api/subscribe-alerts",
                 "function": "subscribeToWeatherAlerts"
             },
