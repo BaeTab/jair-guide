@@ -109,8 +109,8 @@ export default function HomeTab({
                         <span className="text-2xl mb-1 drop-shadow-sm">😷</span>
                         <span className="text-[10px] text-white/50 font-bold mb-0.5">미세먼지</span>
                         <span className={`text-lg font-black tracking-tight ${currentData.pm10 <= 30 ? 'text-emerald-300' :
-                                currentData.pm10 <= 80 ? 'text-yellow-300' :
-                                    currentData.pm10 <= 150 ? 'text-orange-300' : 'text-red-300'
+                            currentData.pm10 <= 80 ? 'text-yellow-300' :
+                                currentData.pm10 <= 150 ? 'text-orange-300' : 'text-red-300'
                             }`}>
                             {currentData.pm10 <= 30 ? '좋음' :
                                 currentData.pm10 <= 80 ? '보통' :
@@ -242,7 +242,7 @@ export default function HomeTab({
                                 <span className="text-2xl mb-1">{currentData.travelIndex.flight.icon}</span>
                                 <span className="text-[10px] opacity-60 font-bold mb-1">항공 (바람)</span>
                                 <span className={`text-xs font-black ${currentData.travelIndex.flight.color}`}>{currentData.travelIndex.flight.status}</span>
-                                {airportWeather?.data?.warn && (
+                                {airportWeather?.data?.warn && airportWeather.data.warn !== '없음' && airportWeather.data.warn !== '특보 없음' && (
                                     <span className="text-[8px] text-orange-300 mt-1">⚠️ 주의보</span>
                                 )}
                             </div>
@@ -338,9 +338,9 @@ export default function HomeTab({
                                     </div>
                                     <div className="text-right">
                                         <div className="text-2xl font-black">
-                                            {airportWeather.data.minTemp}° ~ {airportWeather.data.maxTemp}°
+                                            {airportWeather.data.ta ? `${airportWeather.data.ta}°` : '-'}
                                         </div>
-                                        <p className="text-[10px] text-white/60">최저/최고</p>
+                                        <p className="text-[10px] text-white/60">현재 기온</p>
                                     </div>
                                 </div>
 
@@ -363,7 +363,7 @@ export default function HomeTab({
                                     )}
                                 </div>
 
-                                {airportWeather.data.warn && (
+                                {airportWeather.data.warn && airportWeather.data.warn !== '없음' && airportWeather.data.warn !== '특보 없음' && (
                                     <div className="mt-4 p-3 bg-orange-500/20 rounded-xl border border-orange-400/30">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="text-lg">⚠️</span>

@@ -29,3 +29,6 @@ dist-ssr
 .env.*.local
 functions/.env
 functions/.env.local
+functions/test_cleanhouse.js
+functions/test_pharmacy.js
+functions/test_wifi.js

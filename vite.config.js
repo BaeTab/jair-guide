@@ -90,6 +90,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api\/flights/, '/getJejuFlights')
+      },
+      '/api/clean-house': {
+        target: 'https://us-central1-jair-guide.cloudfunctions.net',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/clean-house/, '/getCleanHouse')
       }
     }
   }

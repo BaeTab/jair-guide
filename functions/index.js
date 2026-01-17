@@ -1104,3 +1104,98 @@ exports.hlsProxy = functions.https.onRequest((req, res) => {
             res.status(502).json({ error: 'Failed to fetch stream', details: error.message });
         });
 });
+
+// Jeju Clean House API Proxy
+exports.getCleanHouse = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const { page = 1, perPage = 200 } = req.query;
+            const apiUrl = "https://api.odcloud.kr/api/15110514/v1/uddi:037de394-ea6f-40e5-9277-cb7b9e36f5ce";
+
+            // Hardcoded Decoding Key as provided by user
+            const DECODED_KEY = "LTVNqKiagRvNnUDX7RDV+7JYziYS7VrhQk6u86ts1ecct1QoAevL5RQkE1Osgj3B+FZUG0oA6BkrAn+Ge2LzwQ==";
+
+            console.log(`Fetching Clean House Data: page=${page}, perPage=${perPage}`);
+
+            const response = await axios.get(apiUrl, {
+                params: {
+                    page: page,
+                    perPage: perPage,
+                    serviceKey: DECODED_KEY,
+                    returnType: 'JSON'
+                },
+                timeout: 15000
+            });
+
+            console.log(`Clean House API Response Status: ${response.status}`);
+            if (response.data) {
+                console.log(`Clean House Data Count: ${response.data.currentCount}`);
+            }
+
+            res.status(200).json(response.data);
+        } catch (error) {
+            console.error("Clean House API Error:", error.message);
+            if (error.response) {
+                console.error("Error Data:", JSON.stringify(error.response.data));
+                console.error("Error Status:", error.response.status);
+            }
+            res.status(500).json({ error: "Failed to fetch Clean House data", details: error.message });
+        }
+    });
+});
+
+// Jeju Pharmacy API Proxy
+exports.getPharmacy = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const { number = 1, limit = 100 } = req.query;
+            const projectKey = "4343_o3b3o8r23o0jcb32r53b3cet082";
+            const apiUrl = `https://open.jejudatahub.net/api/proxy/taD8a8t1atabta1Dtt1tta6bt16ab16a/${projectKey}`;
+
+            const response = await axios.get(apiUrl, {
+                params: {
+                    number: number,
+                    limit: limit
+                },
+                timeout: 10000
+            });
+
+            res.status(200).json(response.data);
+        } catch (error) {
+            console.error("Pharmacy API Error:", error.message);
+            if (error.response) {
+                console.error("Error Data:", JSON.stringify(error.response.data));
+                console.error("Error Status:", error.response.status);
+            }
+            res.status(500).json({ error: "Failed to fetch Pharmacy data", details: error.message });
+        }
+    });
+});
+
+// Jeju Public Wifi API Proxy
+exports.getWifi = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const { number = 1, limit = 100 } = req.query;
+            const projectKey = "4343_o3b3o8r23o0jcb32r53b3cet082";
+            const apiUrl = `https://open.jejudatahub.net/api/proxy/Dtb18ta1btbD1Da1a81aaDttab6tDabb/${projectKey}`;
+
+            const response = await axios.get(apiUrl, {
+                params: {
+                    number: number,
+                    limit: limit
+                },
+                timeout: 10000
+            });
+
+            res.status(200).json(response.data);
+        } catch (error) {
+            console.error("Wifi API Error:", error.message);
+            if (error.response) {
+                console.error("Error Data:", JSON.stringify(error.response.data));
+                console.error("Error Status:", error.response.status);
+            }
+            res.status(500).json({ error: "Failed to fetch Wifi data", details: error.message });
+        }
+    });
+});

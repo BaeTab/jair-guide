@@ -14,6 +14,9 @@ const HomeTab = React.lazy(() => import('./components/HomeTab'));
 const InsightsTab = React.lazy(() => import('./components/InsightsTab'));
 const SettingsTab = React.lazy(() => import('./components/SettingsTab'));
 const CctvTab = React.lazy(() => import('./components/CctvTab'));
+const CleanHouseTab = React.lazy(() => import('./components/CleanHouseTab'));
+const PharmacyTab = React.lazy(() => import('./components/PharmacyTab'));
+const WifiTab = React.lazy(() => import('./components/WifiTab'));
 
 // --- Configuration & Constants ---
 
@@ -149,6 +152,7 @@ function App() {
   const [isKakao, setIsKakao] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showAllMenu, setShowAllMenu] = useState(false);
+  const [isVirtualMode, setIsVirtualMode] = useState(false); // 가상 여행 모드 상태
   const [activeTab, setActiveTab] = useState('home'); // 'home', 'map', 'insights', 'settings'
 
   // Analytics: Track screen views on tab change
@@ -237,13 +241,31 @@ function App() {
         const { latitude, longitude } = position.coords;
         console.log("Detected coordinates:", latitude, longitude);
 
+        // Check if inside Jeju (Approx Bounds: Lat 33.1~34.0, Lon 126.1~127.0)
+        const isJeju = latitude > 33.1 && latitude < 34.0 && longitude > 126.0 && longitude < 127.0;
+
         let locationName = "내 위치";
+        let targetLat = latitude;
+        let targetLng = longitude;
+
+        if (!isJeju) {
+          // Virtual Mode: Force location to Jeju Airport
+          console.log("User is outside Jeju. Activating Virtual Mode.");
+          setIsVirtualMode(true);
+          targetLat = 33.5066;
+          targetLng = 126.4930;
+          locationName = '제주공항 (여행 미리보기)';
+        } else {
+          // Real Jeju Mode
+          setIsVirtualMode(false);
+        }
+
         try {
           // Use our own proxy to avoid CORS/403 with Nominatim
           const geoRes = await axios.get(
             '/api/reverse-geocode',
             {
-              params: { lat: latitude, lon: longitude },
+              params: { lat: targetLat, lon: targetLng },
               timeout: 10000
             }
           );
@@ -613,6 +635,18 @@ function App() {
               />
             )}
 
+            {activeTab === 'cleanhouse' && (
+              <CleanHouseTab />
+            )}
+
+            {activeTab === 'pharmacy' && (
+              <PharmacyTab />
+            )}
+
+            {activeTab === 'wifi' && (
+              <WifiTab />
+            )}
+
             {activeTab === 'settings' && (
               <SettingsTab
                 currentThemeId={currentThemeId}
@@ -626,6 +660,28 @@ function App() {
           </React.Suspense>
         </motion.div>
       </div >
+
+      {/* Virtual Mode Banner */}
+      <AnimatePresence>
+        {isVirtualMode && (
+          <motion.div
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            className="fixed top-0 left-0 right-0 z-[6000] p-2 flex justify-center pointer-events-none"
+          >
+            <div className="bg-emerald-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full shadow-lg border border-white/10 flex items-center gap-2 text-xs font-bold pointer-events-auto shadow-[0_0_20px_rgba(16,185,129,0.4)]">
+              <span>✈️ 제주 여행 미리보기 모드 실행 중</span>
+              <button
+                onClick={() => setIsVirtualMode(false)}
+                className="ml-2 w-5 h-5 flex items-center justify-center bg-black/20 rounded-full hover:bg-black/30"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Sheet Menu */}
       <AnimatePresence>
@@ -650,6 +706,20 @@ function App() {
               <h3 className="text-white/50 text-xs font-bold mb-4 ml-1">전체 메뉴</h3>
               <div className="grid grid-cols-4 gap-4">
                 <button
+                  onClick={() => { setActiveTab('map'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">🗺️</div>
+                  <span className="text-xs font-medium text-white">공기맵</span>
+                </button>
+                <button
+                  onClick={() => { setActiveTab('cctv'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">📹</div>
+                  <span className="text-xs font-medium text-white">CCTV</span>
+                </button>
+                <button
                   onClick={() => { setActiveTab('fishing'); setShowAllMenu(false); }}
                   className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
                 >
@@ -664,11 +734,30 @@ function App() {
                   <span className="text-xs font-medium text-white">분석</span>
                 </button>
 
-                {/* Future Features (Coming Soon) */}
-                <button className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 opacity-40 grayscale">
-                  <div className="text-3xl">🏔️</div>
-                  <span className="text-xs font-medium text-white">오름(예정)</span>
+                <button
+                  onClick={() => { setActiveTab('cleanhouse'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">♻️</div>
+                  <span className="text-xs font-medium text-white">클린하우스</span>
                 </button>
+
+                <button
+                  onClick={() => { setActiveTab('pharmacy'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">💊</div>
+                  <span className="text-xs font-medium text-white">약국</span>
+                </button>
+                <button
+                  onClick={() => { setActiveTab('wifi'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">📶</div>
+                  <span className="text-xs font-medium text-white">와이파이</span>
+                </button>
+
+                {/* Future Features (Coming Soon) */}
                 <button className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 opacity-40 grayscale">
                   <div className="text-3xl">🚗</div>
                   <span className="text-xs font-medium text-white">교통(예정)</span>
@@ -682,20 +771,19 @@ function App() {
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 p-4 z-[4000] pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
-          <div className="glass-premium glass-border rounded-[2.5rem] p-2 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-3xl">
+          <div className="glass-premium glass-border rounded-[2.5rem] p-2 flex items-center justify-around shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-3xl px-6">
             <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon="🏠" label="홈" />
-            <NavButton active={activeTab === 'map'} onClick={() => setActiveTab('map')} icon="🗺️" label="공기맵" />
 
-            <div className="relative -top-5">
+            <div className="relative -top-6">
               <button
                 onClick={() => setShowAllMenu(true)}
-                className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-2xl shadow-lg border-4 border-[#1a1f2c] active:scale-95 transition-all"
+                className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex flex-col items-center justify-center shadow-[0_10px_20px_rgba(16,185,129,0.3)] border-4 border-[#1a1f2c] active:scale-95 transition-all"
               >
-                <span className="filter drop-shadow-md text-white">🧊</span>
+                <span className="filter drop-shadow-md text-white text-2xl mb-0.5">🧊</span>
+                <span className="text-[10px] font-bold text-white/90 leading-none">메뉴</span>
               </button>
             </div>
 
-            <NavButton active={activeTab === 'cctv'} onClick={() => setActiveTab('cctv')} icon="📹" label="CCTV" />
             <NavButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon="✨" label="더보기" />
           </div>
         </div>

@@ -39,6 +39,18 @@
                 "function": "getJejuFlights"
             },
             {
+                "source": "/api/clean-house",
+                "function": "getCleanHouse"
+            },
+            {
+                "source": "/api/pharmacy",
+                "function": "getPharmacy"
+            },
+            {
+                "source": "/api/wifi",
+                "function": "getWifi"
+            },
+            {
                 "source": "**",
                 "destination": "/index.html"
             }

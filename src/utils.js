@@ -78,17 +78,19 @@ export const getTravelIndex = (windSpeed, windGust, visibility, weatherCode) => 
         drive: { status: '드라이브 굿', color: 'text-emerald-400', icon: '🚗', desc: '해안도로 달리기 좋수다.' }
     };
 
-    // 1. Flight (Wind & Gust)
-    if (windGust > 20 || windSpeed > 15) {
+    // 1. Flight (Wind & Gust - using km/h thresholds)
+    // Thresholds: ~50km/h (14m/s) for delay, ~70km/h (19m/s) for cancellation
+    if (windGust > 70 || windSpeed > 60) {
         result.flight = { status: '결항 주의', color: 'text-red-400', icon: '⛔', desc: '바람이 쎄서 비행기 못 뜰수도.' };
-    } else if (windGust > 15 || windSpeed > 10) {
+    } else if (windGust > 50 || windSpeed > 40) {
         result.flight = { status: '지연 가능성', color: 'text-yellow-400', icon: '⚠️', desc: '비행기가 덜컹거릴 거우다.' };
     }
 
     // 2. Ship (Wind)
-    if (windSpeed > 14) {
+    // Thresholds: ~30km/h (8m/s) for rough sea, ~50km/h (14m/s) for control
+    if (windSpeed > 50) {
         result.ship = { status: '결항 통제', color: 'text-red-400', icon: '⚓', desc: '배 뜨기 힘들겠수다.' };
-    } else if (windSpeed > 9) {
+    } else if (windSpeed > 30) {
         result.ship = { status: '멀미 주의', color: 'text-yellow-400', icon: '🌊', desc: '파도가 높으니 멀미약 챙깁서.' };
     }
 
