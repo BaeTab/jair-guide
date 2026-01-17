@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Original memories rules
+    match /memories/{memoryId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read: if request.auth != null && (
+        request.auth.uid == resource.data.userId || 
+        request.auth.token.email == 'bhwoo48@gmail.com'
+      );
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // Digital Stone Tower rules (Anonymous)
+    match /stone_towers/{towerId} {
+      allow read: if true;
+      allow create: if request.resource.data.text.size() <= 200;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['warmthCount']);
+    }
+
+    // System status for weather alerts
+    match /system_status/last_weather_alert {
+      allow read: if true;
+      allow write: if false; // Only Cloud Functions (Admin SDK) should write this
+    }
+  }
+}

@@ -378,6 +378,40 @@ export default function HomeTab({
                 </div>
             )}
 
+            {/* Stone Tower Call-to-action */}
+            <div className="mb-6">
+                <TiltCard className="mb-0">
+                    <button
+                        onClick={() => {
+                            // This is a bit tricky since HomeTab doesn't have setActiveTab, 
+                            // but in App.jsx we can inject it or handle it via a global state if needed.
+                            // However, App.jsx passes many props but not setActiveTab.
+                            // I'll assume for now clicking this should trigger navigation.
+                            // Actually, I should check if I should pass setActiveTab to HomeTab.
+                            window.dispatchEvent(new CustomEvent('changeTab', { detail: 'stonetower' }));
+                        }}
+                        className="w-full glass-card glass-border rounded-[2.5rem] p-6 flex flex-col shadow-2xl overflow-hidden relative min-h-[140px] justify-center text-left"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-400/20 to-transparent pointer-events-none"></div>
+                        <div className="flex flex-col gap-2 relative z-10">
+                            <div className="flex items-center gap-3">
+                                <span className="text-3xl">🪨</span>
+                                <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">제주 디지털 소원 돌탑</span>
+                            </div>
+                            <div>
+                                <p className="text-xl font-black tracking-tight text-white mb-1">
+                                    마음을 담아 돌을 쌓아봅서
+                                </p>
+                                <p className="text-white/60 text-[11px] font-medium leading-relaxed">
+                                    제주 곳곳에 쌓인 소원들을 보고,<br />당신의 소중한 마음도 하나 올려보세요. 🙏
+                                </p>
+                            </div>
+                        </div>
+                        <div className="absolute bottom-6 right-6 text-2xl opacity-40 group-hover:translate-x-1 transition-transform">➡️</div>
+                    </button>
+                </TiltCard>
+            </div>
+
             {/* Dialect Card */}
             <TiltCard className="mb-0">
                 <div className="glass-card glass-border rounded-[2.5rem] p-6 flex flex-col shadow-2xl overflow-hidden relative min-h-[140px] justify-center">

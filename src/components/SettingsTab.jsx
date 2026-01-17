@@ -1,7 +1,7 @@
 import React from 'react';
 import { THEMES } from '../constants';
 
-export default function SettingsTab({ currentThemeId, setCurrentThemeId, currentTheme }) {
+export default function SettingsTab({ currentThemeId, setCurrentThemeId, currentTheme, subscribeToAlerts }) {
     return (
         <div className="flex-1 overflow-y-auto p-6 text-white pb-32">
             <h2 className="text-2xl font-black mb-1">더보기</h2>
@@ -30,6 +30,26 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
                         </button>
                     ))}
                 </div>
+            </div>
+
+            {/* Weather Alert Subscription (New) */}
+            <div className="glass-card glass-border rounded-[2rem] p-6 mb-6 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-6xl">⚠️</div>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center text-2xl shadow-inner">🔔</div>
+                        <div>
+                            <h4 className="font-black text-sm">기상 특보 푸시 알림</h4>
+                            <p className="text-[10px] text-white/40 font-bold">제주 특보 발령 시 즉시 알려드려요</p>
+                        </div>
+                    </div>
+                </div>
+                <button
+                    onClick={subscribeToAlerts}
+                    className="w-full mt-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl py-3 text-xs font-black transition-all active:scale-95"
+                >
+                    알림 구독하기
+                </button>
             </div>
 
             <div className="space-y-4">

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { analytics } from './firebase';
+import { analytics, messaging } from './firebase';
+import { getToken } from 'firebase/messaging';
 import { logEvent } from 'firebase/analytics';
 import { INITIAL_LOCATIONS, COLORS, MESSAGES, THEMES } from './constants';
 import { getWeather, getStatus, getTravelIndex, calculateHallaIndex, getJejuActivity, getLifestyleTips, calculateRadarStats } from './utils';
@@ -17,6 +18,7 @@ const CctvTab = React.lazy(() => import('./components/CctvTab'));
 const CleanHouseTab = React.lazy(() => import('./components/CleanHouseTab'));
 const PharmacyTab = React.lazy(() => import('./components/PharmacyTab'));
 const WifiTab = React.lazy(() => import('./components/WifiTab'));
+const StoneTowerTab = React.lazy(() => import('./components/StoneTowerTab'));
 
 // --- Configuration & Constants ---
 
@@ -430,6 +432,36 @@ function App() {
     }
   }, [selectedLoc, dataMap]);
 
+  useEffect(() => {
+    const handleTabChange = (e) => {
+      if (e.detail) setActiveTab(e.detail);
+    };
+    window.addEventListener('changeTab', handleTabChange);
+    return () => window.removeEventListener('changeTab', handleTabChange);
+  }, []);
+
+  const subscribeToAlerts = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        alert('알림 권한이 거부되었습니다. 브라우저 설정에서 권한을 허용해주세요.');
+        return;
+      }
+
+      const token = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+      });
+
+      if (token) {
+        await axios.post('/api/subscribe-alerts', { token });
+        alert('제주 기상 특보 알림 구독이 완료되었습니다! ⚠️');
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      alert('알림 구독 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+  };
+
   const currentData = dataMap[selectedLoc.id];
   const weather = currentData ? getWeather(currentData.weatherCode) : { icon: '', label: '' };
 
@@ -635,6 +667,10 @@ function App() {
               />
             )}
 
+            {activeTab === 'stonetower' && (
+              <StoneTowerTab currentTheme={currentTheme} />
+            )}
+
             {activeTab === 'cleanhouse' && (
               <CleanHouseTab />
             )}
@@ -653,6 +689,7 @@ function App() {
                 setCurrentThemeId={setCurrentThemeId}
                 currentTheme={currentTheme}
                 THEMES={THEMES}
+                subscribeToAlerts={subscribeToAlerts}
               />
             )}
 
@@ -755,6 +792,14 @@ function App() {
                 >
                   <div className="text-3xl filter drop-shadow-lg">📶</div>
                   <span className="text-xs font-medium text-white">와이파이</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveTab('stonetower'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-400/20 border border-amber-400/30 hover:bg-amber-400/30 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">🪨</div>
+                  <span className="text-xs font-black text-amber-200">소원 돌탑</span>
                 </button>
 
                 {/* Future Features (Coming Soon) */}

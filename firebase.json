@@ -2,6 +2,9 @@
     "functions": {
         "source": "functions"
     },
+    "firestore": {
+        "rules": "firestore.rules"
+    },
     "hosting": {
         "public": "dist",
         "ignore": [
@@ -49,6 +52,14 @@
             {
                 "source": "/api/wifi",
                 "function": "getWifi"
+            },
+            {
+                "source": "/api/subscribe-alerts",
+                "function": "subscribeToWeatherAlerts"
+            },
+            {
+                "source": "/api/test-alert",
+                "function": "sendTestAlert"
             },
             {
                 "source": "**",

@@ -96,6 +96,24 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api\/clean-house/, '/getCleanHouse')
+      },
+      '/api/pharmacy': {
+        target: 'https://us-central1-jair-guide.cloudfunctions.net',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/pharmacy/, '/getPharmacy')
+      },
+      '/api/wifi': {
+        target: 'https://us-central1-jair-guide.cloudfunctions.net',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/wifi/, '/getWifi')
+      },
+      '/api/subscribe-alerts': {
+        target: 'https://us-central1-jair-guide.cloudfunctions.net',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/subscribe-alerts/, '/subscribeToWeatherAlerts')
       }
     }
   }

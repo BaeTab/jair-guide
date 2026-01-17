@@ -1,4 +1,5 @@
 const functions = require("firebase-functions");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
 const axios = require("axios");
 const cors = require("cors")({ origin: true });
@@ -189,6 +190,21 @@ exports.getJejuTide = functions.https.onRequest((req, res) => {
     cors(req, res, () => {
         const tide = getJejuTideInfo();
         res.status(200).json({ success: true, ...tide });
+    });
+});
+
+exports.subscribeToWeatherAlerts = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const { token } = req.body;
+            if (!token) return res.status(400).json({ error: "Token required" });
+
+            await admin.messaging().subscribeToTopic(token, 'jeju-weather-alerts');
+            return res.status(200).json({ success: true, message: "Subscribed to jeju-weather-alerts" });
+        } catch (error) {
+            console.error("Subscription Error:", error);
+            return res.status(500).json({ error: error.message });
+        }
     });
 });
 
@@ -1196,6 +1212,97 @@ exports.getWifi = functions.https.onRequest((req, res) => {
                 console.error("Error Status:", error.response.status);
             }
             res.status(500).json({ error: "Failed to fetch Wifi data", details: error.message });
+        }
+    });
+});
+// Scheduled function to check for Jeju Weather Alerts every 30 minutes
+exports.checkJejuWeatherAlerts = onSchedule('every 30 minutes', async (event) => {
+    try {
+        console.log("Checking Jeju Weather Alerts...");
+        const encodedKey = encodeURIComponent(SERVICE_KEY);
+        const now = moment().tz("Asia/Seoul");
+        const baseDate = now.format("YYYYMMDD");
+
+        // We use the Airport Weather API as a reliable source for Jeju-specific warnings 
+        // because it summarizes the most critical impact for travel.
+        const url = `http://apis.data.go.kr/1360000/AirPortService/getAirPort?serviceKey=${encodedKey}&pageNo=1&numOfRows=1&dataType=JSON&base_date=${baseDate}&base_time=0600&airPortCd=RKPC`;
+
+        const response = await axios.get(url);
+        const item = response.data.response?.body?.items?.item;
+        const airportData = Array.isArray(item) ? item[0] : item;
+
+        if (!airportData || (!airportData.warn && !airportData.alert)) {
+            console.log("No active alerts found.");
+            return null;
+        }
+
+        const alertText = airportData.alert || airportData.warn;
+        if (alertText === '없음' || alertText === '특보 없음' || !alertText) {
+            console.log("Alert text is empty or 'none'.");
+            return null;
+        }
+
+        // Check if this is a new alert using Firestore
+        const alertRef = admin.firestore().collection('system_status').doc('last_weather_alert');
+        const doc = await alertRef.get();
+        const lastAlert = doc.exists ? doc.data().text : "";
+
+        if (alertText !== lastAlert) {
+            console.log("New Alert Detected! Sending notification...");
+
+            const message = {
+                notification: {
+                    title: '⚠️ 제주 기상 특보 알림',
+                    body: alertText.length > 100 ? alertText.substring(0, 97) + '...' : alertText,
+                },
+                topic: 'jeju-weather-alerts',
+                webpush: {
+                    fcm_options: {
+                        link: 'https://jair-guide.web.app'
+                    }
+                }
+            };
+
+            await admin.messaging().send(message);
+            await alertRef.set({
+                text: alertText,
+                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+
+            console.log("Notification sent successfully.");
+        } else {
+            console.log("Alert exists but has not changed.");
+        }
+
+        return null;
+    } catch (error) {
+        console.error("Scheduled Alert Check Error:", error);
+        return null;
+    }
+});
+
+// Utility function to send a test notification (Development only)
+exports.sendTestAlert = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const message = {
+                notification: {
+                    title: '🧪 제주바람 테스트 알림',
+                    body: '푸시 알림이 정상적으로 작동하고 있수다! (테스트 메시지)',
+                },
+                topic: 'jeju-weather-alerts',
+                webpush: {
+                    fcm_options: {
+                        link: 'https://jair-guide.web.app'
+                    }
+                }
+            };
+
+            const response = await admin.messaging().send(message);
+            return res.status(200).json({ success: true, messageId: response });
+        } catch (error) {
+            console.error("Test Notification Error:", error);
+            return res.status(500).json({ error: error.message });
         }
     });
 });
