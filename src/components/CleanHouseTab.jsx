@@ -163,7 +163,7 @@ export default function CleanHouseTab() {
 
             {/* Zoom Alert Overlay */}
             {!loading && zoom < 15 && (
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[450] pointer-events-none w-full px-10">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[450] pointer-events-none w-full px-4">
                     <div className="bg-black/70 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl text-center border border-white/10 flex flex-col items-center gap-2 animate-pulse">
                         <span className="text-3xl">🔍</span>
                         <div>

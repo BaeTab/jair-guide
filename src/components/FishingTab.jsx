@@ -76,7 +76,7 @@ export default function FishingTab({ seaTripData, seaFishingData, loading }) {
     };
 
     return (
-        <div className="flex-1 overflow-y-auto pt-6 px-6 pb-24 text-white z-10 scroll-smooth bg-slate-900/50">
+        <div className="flex-1 overflow-y-auto pt-6 px-4 pb-24 text-white z-10 scroll-smooth bg-slate-900/50">
             {/* Header */}
             <div className="mb-6">
                 <div className="flex items-center justify-between">

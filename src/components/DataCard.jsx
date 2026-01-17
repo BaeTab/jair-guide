@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function DataCard({ label, value, subValue, unit, loading, statusText, statusColor }) {
     return (
-        <div className="glass-card glass-border rounded-3xl p-5 flex flex-col items-center justify-center shadow-2xl transition-all hover:bg-white/20 h-full min-h-[130px] w-full">
+        <div className="glass-card glass-border rounded-3xl p-4 flex flex-col items-center justify-center shadow-2xl transition-all hover:bg-white/20 h-full min-h-[130px] w-full">
             <span className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">{label}</span>
             {loading || value === undefined ? (
                 <div className="h-8 w-12 bg-white/20 animate-pulse rounded my-1"></div>

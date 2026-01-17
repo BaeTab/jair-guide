@@ -221,7 +221,7 @@ export default function CctvTab() {
     return (
         <div className="flex-1 flex flex-col relative z-10 overflow-hidden">
             {/* Header */}
-            <div className="px-6 pt-6 pb-4 flex-shrink-0">
+            <div className="px-4 pt-6 pb-4 flex-shrink-0">
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h1 className="text-2xl font-black text-white">제주 CCTV</h1>
@@ -255,7 +255,7 @@ export default function CctvTab() {
                 </div>
 
                 {/* Category Filter */}
-                <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 scrollbar-hide">
+                <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
                     {CATEGORIES.map((category) => {
                         const count = category === '전체'
                             ? CCTV_DATA.length
@@ -277,7 +277,7 @@ export default function CctvTab() {
             </div>
 
             {/* CCTV List */}
-            <div className="flex-1 overflow-y-auto px-6 pb-32">
+            <div className="flex-1 overflow-y-auto px-4 pb-32">
                 <div className="space-y-3">
                     <p className="text-white/40 text-xs">{filteredCctvs.length}개의 CCTV</p>
                     {filteredCctvs.map((cctv) => (

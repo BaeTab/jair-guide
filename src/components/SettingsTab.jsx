@@ -3,12 +3,12 @@ import { THEMES } from '../constants';
 
 export default function SettingsTab({ currentThemeId, setCurrentThemeId, currentTheme, subscribeToAlerts }) {
     return (
-        <div className="flex-1 overflow-y-auto p-6 text-white pb-32">
+        <div className="flex-1 overflow-y-auto p-4 text-white pb-32">
             <h2 className="text-2xl font-black mb-1">더보기</h2>
             <p className="text-white/60 text-xs mb-8">앱 설정 및 제주바람 정보</p>
 
             {/* Theme Switcher */}
-            <div className="glass-card glass-border rounded-3xl p-6 mb-6 shadow-xl">
+            <div className="glass-card glass-border rounded-3xl p-5 mb-6 shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
                     <span className="text-2xl">🎨</span>
                     <div>
@@ -33,7 +33,7 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
             </div>
 
             {/* Weather Alert Subscription (New) */}
-            <div className="glass-card glass-border rounded-[2rem] p-6 mb-6 shadow-xl relative overflow-hidden">
+            <div className="glass-card glass-border rounded-[2rem] p-5 mb-6 shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10 text-6xl">⚠️</div>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -55,7 +55,7 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
             <div className="space-y-4">
                 <a
                     href="mailto:b_h_woo@naver.com"
-                    className="glass-card glass-border rounded-3xl p-6 flex items-center justify-between shadow-xl hover:bg-white/10 transition-all group"
+                    className="glass-card glass-border rounded-3xl p-5 flex items-center justify-between shadow-xl hover:bg-white/10 transition-all group"
                 >
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center text-2xl shadow-inner">👤</div>
@@ -70,7 +70,7 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
                     </div>
                 </a>
 
-                <div className="glass-card glass-border rounded-3xl p-6 flex items-center justify-between shadow-xl">
+                <div className="glass-card glass-border rounded-3xl p-5 flex items-center justify-between shadow-xl">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center text-2xl shadow-inner">📦</div>
                         <div>
@@ -81,7 +81,7 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
                     <div className="text-xs text-emerald-400 font-black tracking-widest">✓ LATEST</div>
                 </div>
 
-                <div className="glass-card glass-border rounded-3xl p-6 shadow-xl">
+                <div className="glass-card glass-border rounded-3xl p-5 shadow-xl">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center text-2xl shadow-inner">🛰️</div>
                         <div>
@@ -104,7 +104,7 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
                     href="https://buymeacoffee.com/bhwoo484"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block glass-card glass-border rounded-3xl p-6 shadow-xl hover:bg-white/10 transition-all duration-300 group"
+                    className="block glass-card glass-border rounded-3xl p-5 shadow-xl hover:bg-white/10 transition-all duration-300 group"
                 >
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">

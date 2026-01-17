@@ -18,6 +18,7 @@ const CctvTab = React.lazy(() => import('./components/CctvTab'));
 const CleanHouseTab = React.lazy(() => import('./components/CleanHouseTab'));
 const PharmacyTab = React.lazy(() => import('./components/PharmacyTab'));
 const StoneTowerTab = React.lazy(() => import('./components/StoneTowerTab'));
+import BackgroundMesh from './components/BackgroundMesh';
 
 // --- Configuration & Constants ---
 
@@ -57,10 +58,8 @@ function WeatherBackground({ weatherCode, statusType, themeColors }) {
   const isDusty = ['unhealthy', 'hazardous'].includes(statusType);
 
   // Use theme background gradient if available, otherwise fallback
-  const bgClass = themeColors?.bg ? `bg-gradient-to-br ${themeColors.bg}` : (isRain || isSnow || isCloudy ? 'bg-slate-900' : 'bg-slate-900');
-
   return (
-    <div className={`absolute inset-0 overflow-hidden pointer-events-none z-0 transition-colors duration-1000 ${bgClass}`}>
+    <div className={`absolute inset-0 overflow-hidden pointer-events-none z-0 transition-colors duration-1000`}>
       {/* Rain Effect */}
       {isRain && particles.map(p => (
         <div
@@ -466,10 +465,9 @@ function App() {
 
   return (
     <motion.div
-      className="min-h-screen w-full flex flex-col transition-colors duration-1000 ease-in-out font-sans scroll-smooth relative"
-      animate={{ backgroundColor: mainStatus.color }}
-      initial={{ backgroundColor: COLORS.good }}
+      className="min-h-screen w-full flex flex-col transition-colors duration-1000 ease-in-out font-sans scroll-smooth relative overflow-hidden"
     >
+      <BackgroundMesh themeId={currentThemeId} mainStatus={mainStatus} />
       {/* Install Banner at the absolute top */}
       {showBanner && activeTab === 'home' && (
         <motion.div
@@ -804,7 +802,7 @@ function App() {
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 p-4 z-[4000] pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
-          <div className="glass-premium glass-border rounded-[2.5rem] p-2 flex items-center justify-around shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-3xl px-6">
+          <div className="glass-premium glass-border rounded-[2.5rem] p-2 flex items-center justify-around shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 backdrop-blur-3xl px-4">
             <NavButton active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon="🏠" label="홈" />
 
             <div className="relative -top-6">

@@ -92,7 +92,7 @@ export default function MapTab({ locations, dataMap, selectedLoc, setSelectedLoc
 
     return (
         <div className="flex-1 flex flex-col h-full bg-slate-900 border-b border-white/5">
-            <div className="px-6 pt-6 pb-4">
+            <div className="px-4 pt-6 pb-4">
                 <h2 className="text-2xl font-black text-white mb-1">제주 전역 지도</h2>
                 <p className="text-white/60 text-xs">관심 있는 지역의 고르멍 확인해봅서.</p>
             </div>
@@ -280,7 +280,7 @@ export default function MapTab({ locations, dataMap, selectedLoc, setSelectedLoc
                 </MapContainer>
             </div>
             {/* Bottom Card for Selected Location in Map */}
-            <div className="p-6 pb-32">
+            <div className="p-4 pb-32">
                 <div className="glass-card glass-border rounded-[2rem] p-6 shadow-2xl flex items-center justify-between transition-all hover:bg-white/10 active:scale-95">
                     <div>
                         <div className="flex items-center gap-2 mb-1">

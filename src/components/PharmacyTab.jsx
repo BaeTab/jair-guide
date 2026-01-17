@@ -130,7 +130,7 @@ export default function PharmacyTab() {
             </div>
 
             {/* List */}
-            <div className="flex-1 overflow-y-auto px-6 pb-24 safe-area-bottom w-full max-w-md mx-auto scrollbar-hide">
+            <div className="flex-1 overflow-y-auto px-4 pb-24 safe-area-bottom w-full max-w-md mx-auto scrollbar-hide">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center h-48 gap-3">
                         <div className="animate-spin text-3xl">💊</div>

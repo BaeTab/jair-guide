@@ -140,7 +140,7 @@ export default function StoneTowerTab({ currentTheme }) {
     const totalStones = wishes.length;
 
     return (
-        <div className="flex-1 overflow-y-auto p-6 text-white pb-32">
+        <div className="flex-1 overflow-y-auto p-4 text-white pb-32">
             <div className="flex items-center justify-between mb-2">
                 <div>
                     <h2 className="text-2xl font-black mb-1">디지털 소원 돌탑</h2>
@@ -321,8 +321,8 @@ export default function StoneTowerTab({ currentTheme }) {
                                                 onClick={() => handleAddWarmth(wish.id)}
                                                 disabled={likedPosts.includes(wish.id)}
                                                 className={`flex items-center gap-1 text-[10px] font-black px-3 py-1.5 rounded-full transition-all active:scale-90 ${likedPosts.includes(wish.id)
-                                                        ? 'bg-amber-400 text-white shadow-inner'
-                                                        : 'text-amber-400 bg-amber-400/10 hover:bg-amber-400/20'
+                                                    ? 'bg-amber-400 text-white shadow-inner'
+                                                    : 'text-amber-400 bg-amber-400/10 hover:bg-amber-400/20'
                                                     }`}
                                             >
                                                 {likedPosts.includes(wish.id) ? '❤️ 온기 보냄' : `🔥 온기 ${wish.warmthCount || 0}`}

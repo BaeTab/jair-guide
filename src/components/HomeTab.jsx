@@ -19,7 +19,7 @@ export default function HomeTab({
     airportWeather
 }) {
     return (
-        <div className="flex-1 overflow-y-auto pt-6 px-6 pb-10 text-white z-10 scroll-smooth">
+        <div className="flex-1 overflow-y-auto pt-6 px-4 pb-10 text-white z-10 scroll-smooth">
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 opacity-90">

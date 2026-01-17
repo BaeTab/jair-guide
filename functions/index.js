@@ -1210,9 +1210,14 @@ exports.checkJejuWeatherAlerts = onSchedule('every 30 minutes', async (event) =>
             return null;
         }
 
-        const alertText = airportData.alert || airportData.warn;
-        if (alertText === '없음' || alertText === '특보 없음' || !alertText) {
-            console.log("Alert text is empty or 'none'.");
+        let alertText = airportData.alert || airportData.warn || "";
+
+        // Explicitly check for strings that mean "No Alert"
+        const noAlertKeywords = ['없음', '특보 없음', '특보없음', '해제', '종료'];
+        const isIgnorableText = noAlertKeywords.some(keyword => alertText.includes(keyword)) || !alertText.trim();
+
+        if (isIgnorableText) {
+            console.log(`Alert text '${alertText}' is ignored.`);
             return null;
         }
 

@@ -10,7 +10,7 @@ export default function InsightsTab({ currentData, loading }) {
     const pm25Info = currentData?.pm2_5 ? getPmStatus('pm25', currentData.pm2_5) : { text: '', color: '' };
 
     return (
-        <div className="flex-1 overflow-y-auto p-6 pb-32 text-white">
+        <div className="flex-1 overflow-y-auto p-4 pb-32 text-white">
             <div className="flex items-center justify-between mb-1">
                 <h2 className="text-2xl font-black">상세 대기 리포트</h2>
                 <SupportButton />
@@ -47,7 +47,7 @@ export default function InsightsTab({ currentData, loading }) {
             </div>
 
             {/* Jeju Life Balance Radar Chart */}
-            <div className="glass-card glass-border rounded-[2.5rem] p-6 mb-8 shadow-2xl relative overflow-hidden text-center">
+            <div className="glass-card glass-border rounded-[2.5rem] p-5 mb-8 shadow-2xl relative overflow-hidden text-center">
                 <div className="mb-4">
                     <h4 className="text-xl font-black text-white mb-1">제주 라이프 밸런스</h4>
                     <p className="text-white/60 text-xs">5가지 요소로 분석한 오늘의 점수</p>
@@ -62,7 +62,7 @@ export default function InsightsTab({ currentData, loading }) {
 
             {/* UV Index Placeholder */}
             {/* UV Index Section (Now Real Data) */}
-            <div className="glass-card glass-border rounded-[2.5rem] p-6 mb-8 shadow-2xl">
+            <div className="glass-card glass-border rounded-[2.5rem] p-5 mb-8 shadow-2xl">
                 <h4 className="text-xs font-black text-white/40 mb-4 uppercase tracking-widest">자외선 지수 (UV)</h4>
                 <div className="flex items-end gap-4">
                     <div className="text-4xl font-black">{currentData?.uvIndex !== undefined ? currentData.uvIndex : '-'}</div>
