@@ -24,6 +24,12 @@ export default function StoneTowerTab({ currentTheme }) {
     const [userRegion, setUserRegion] = useState(null);
     const [isLocating, setIsLocating] = useState(false);
 
+    // Track liked posts in localStorage
+    const [likedPosts, setLikedPosts] = useState(() => {
+        const saved = localStorage.getItem('stone_tower_likes');
+        return saved ? JSON.parse(saved) : [];
+    });
+
     useEffect(() => {
         const q = query(collection(db, 'stone_towers'), orderBy('createdAt', 'desc'));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -113,11 +119,18 @@ export default function StoneTowerTab({ currentTheme }) {
     };
 
     const handleAddWarmth = async (wishId) => {
+        if (likedPosts.includes(wishId)) return;
+
         const wishRef = doc(db, 'stone_towers', wishId);
         try {
             await updateDoc(wishRef, {
                 warmthCount: increment(1)
             });
+
+            // Save to localStorage
+            const newLikes = [...likedPosts, wishId];
+            setLikedPosts(newLikes);
+            localStorage.setItem('stone_tower_likes', JSON.stringify(newLikes));
         } catch (error) {
             console.error("Error adding warmth: ", error);
         }
@@ -306,9 +319,13 @@ export default function StoneTowerTab({ currentTheme }) {
                                             </span>
                                             <button
                                                 onClick={() => handleAddWarmth(wish.id)}
-                                                className="flex items-center gap-1 text-[10px] font-black text-amber-400 bg-amber-400/10 px-2 py-1 rounded-full hover:bg-amber-400/20 transition-all active:scale-90"
+                                                disabled={likedPosts.includes(wish.id)}
+                                                className={`flex items-center gap-1 text-[10px] font-black px-3 py-1.5 rounded-full transition-all active:scale-90 ${likedPosts.includes(wish.id)
+                                                        ? 'bg-amber-400 text-white shadow-inner'
+                                                        : 'text-amber-400 bg-amber-400/10 hover:bg-amber-400/20'
+                                                    }`}
                                             >
-                                                🔥 온기 {wish.warmthCount || 0}
+                                                {likedPosts.includes(wish.id) ? '❤️ 온기 보냄' : `🔥 온기 ${wish.warmthCount || 0}`}
                                             </button>
                                         </div>
                                     </div>
