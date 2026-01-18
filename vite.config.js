@@ -134,6 +134,24 @@ export default defineConfig({
         secure: false,
         rewrite: (path) => path.replace(/^\/api\/subscribe-alerts/, '/subscribeToWeatherAlerts')
       },
+      '/api/unsubscribe-alerts': {
+        target: 'https://us-central1-jair-guide.cloudfunctions.net',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/unsubscribe-alerts/, '/unsubscribeFromWeatherAlerts')
+      },
+      '/api/subscribe-market-alerts': {
+        target: 'https://us-central1-jair-guide.cloudfunctions.net',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/subscribe-market-alerts/, '/subscribeToMarketAlerts')
+      },
+      '/api/unsubscribe-market-alerts': {
+        target: 'https://us-central1-jair-guide.cloudfunctions.net',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/unsubscribe-market-alerts/, '/unsubscribeFromMarketAlerts')
+      },
       '/api/hospital': {
         target: 'https://us-central1-jair-guide.cloudfunctions.net',
         changeOrigin: true,

@@ -1373,3 +1373,137 @@ exports.getCoupangAds = functions.https.onRequest((req, res) => {
         }
     });
 });
+
+// --- Jeju 5-Day Market Notification Scheduler ---
+
+// 제주 오일장 데이터 (Functions용)
+const MARKET_DATA = [
+    { name: '대정오일시장', days: [1, 6] },
+    { name: '함덕오일시장', days: [1, 6] },
+    { name: '제주민속오일시장', days: [2, 7] },
+    { name: '표선오일시장', days: [2, 7] },
+    { name: '중문오일시장', days: [3, 8] },
+    { name: '서귀포향토오일시장', days: [4, 9] },
+    { name: '한림민속오일시장', days: [4, 9] },
+    { name: '세화오일시장', days: [5, 10] },
+    { name: '고성오일시장', days: [5, 10] },
+];
+
+/**
+ * 매일 아침 7시에 실행되어 오늘 열리는 오일장 알림 전송
+ * Topic: 'daily_market'
+ */
+exports.sendMarketNotification = onSchedule({
+    schedule: "every day 07:00",
+    timeZone: "Asia/Seoul",
+}, async (event) => {
+    try {
+        const now = moment().tz("Asia/Seoul");
+        const dayOfMonth = now.date(); // 1~31
+        const lastDigit = dayOfMonth % 10;
+        const todayStr = now.format("M월 D일");
+
+        // 오늘 열리는 장 찾기
+        const openMarkets = MARKET_DATA.filter(market => {
+            return market.days.some(d => {
+                if (d === 10) return lastDigit === 0; // 10일, 20일, 30일 -> 0
+                return lastDigit === d;
+            });
+        });
+
+        if (openMarkets.length === 0) {
+            console.log(`[Market Alert] ${todayStr} - No markets open today.`);
+            return;
+        }
+
+        const marketNames = openMarkets.map(m => m.name).join(', ');
+        const count = openMarkets.length;
+
+        // 알림 메시지 구성
+        const message = {
+            notification: {
+                title: `🛒 오늘(${todayStr}) 열리는 오일장!`,
+                body: `${marketNames} 등 ${count}곳이 열렸어요. 구경하러 가볼까요?`,
+            },
+            topic: 'daily_market', // 'daily_market' 토픽 구독자에게 전송
+            webpush: {
+                fcm_options: {
+                    link: 'https://jair-guide.web.app/?tab=market' // 클릭 시 오일장 탭으로 이동
+                }
+            }
+        };
+
+        const response = await admin.messaging().send(message);
+        console.log(`[Market Alert] Sent notification: ${response}`);
+        console.log(`[Market Alert] Markets: ${marketNames}`);
+
+    } catch (error) {
+        console.error("[Market Alert] Error sending notification:", error);
+    }
+});
+
+// 알림 구독용 API (클라이언트에서 호출)
+exports.subscribeToMarketAlerts = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const { token } = req.body;
+            if (!token) return res.status(400).json({ error: "Token required" });
+
+            // 'daily_market' 토픽 구독
+            await admin.messaging().subscribeToTopic(token, 'daily_market');
+            console.log(`[Subscribe] Token subscribed to 'daily_market': ${token.substring(0, 10)}...`);
+
+            return res.status(200).json({ success: true, message: "Subscribed to daily_market" });
+        } catch (error) {
+            console.error("Subscription Error:", error);
+            return res.status(500).json({ error: error.message });
+        }
+    });
+});
+
+// --- Unsubscribe Functions ---
+
+exports.unsubscribeFromWeatherAlerts = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const { token } = req.body;
+            if (!token) return res.status(400).json({ error: "Token required" });
+
+            await admin.messaging().unsubscribeFromTopic(token, 'jeju-weather-alerts');
+            return res.status(200).json({ success: true, message: "Unsubscribed from jeju-weather-alerts" });
+        } catch (error) {
+            console.error("Unsubscription Error:", error);
+            return res.status(500).json({ error: error.message });
+        }
+    });
+});
+
+exports.unsubscribeFromMarketAlerts = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const { token } = req.body;
+            if (!token) return res.status(400).json({ error: "Token required" });
+
+            await admin.messaging().unsubscribeFromTopic(token, 'daily_market');
+            return res.status(200).json({ success: true, message: "Unsubscribed from daily_market" });
+        } catch (error) {
+            console.error("Unsubscription Error:", error);
+            return res.status(500).json({ error: error.message });
+        }
+    });
+});
+
+exports.subscribeToWeatherAlerts = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const { token } = req.body;
+            if (!token) return res.status(400).json({ error: "Token required" });
+
+            await admin.messaging().subscribeToTopic(token, 'jeju-weather-alerts');
+            return res.status(200).json({ success: true, message: "Subscribed to jeju-weather-alerts" });
+        } catch (error) {
+            console.error("Subscription Error:", error);
+            return res.status(500).json({ error: error.message });
+        }
+    });
+});

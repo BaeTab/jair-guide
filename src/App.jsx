@@ -20,6 +20,7 @@ const CleanHouseTab = React.lazy(() => import('./components/CleanHouseTab'));
 const PharmacyTab = React.lazy(() => import('./components/PharmacyTab'));
 const StoneTowerTab = React.lazy(() => import('./components/StoneTowerTab'));
 const HospitalTab = React.lazy(() => import('./components/HospitalTab'));
+const MarketTab = React.lazy(() => import('./components/MarketTab'));
 import BackgroundMesh from './components/BackgroundMesh';
 
 // --- Configuration & Constants ---
@@ -139,14 +140,16 @@ function App() {
   const [showBanner, setShowBanner] = useState(false);
   const [isKakao, setIsKakao] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+
   const [showAllMenu, setShowAllMenu] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false); // 웰컴 알림 유도 모달
   const [isVirtualMode, setIsVirtualMode] = useState(false); // 가상 여행 모드 상태
   const [activeTab, setActiveTab] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const queryTab = params.get('tab');
     const hashTab = window.location.hash.replace('#', '');
     const tab = queryTab || hashTab;
-    const validTabs = ['home', 'map', 'cctv', 'fishing', 'insights', 'cleanhouse', 'pharmacy', 'hospital', 'settings', 'stonetower'];
+    const validTabs = ['home', 'map', 'cctv', 'fishing', 'insights', 'cleanhouse', 'pharmacy', 'hospital', 'settings', 'stonetower', 'market'];
     return validTabs.includes(tab) ? tab : 'home';
   }); // 'home', 'map', 'insights', 'settings'
 
@@ -158,7 +161,7 @@ function App() {
       const hashTab = window.location.hash.replace('#', '');
       const tab = queryTab || hashTab;
 
-      const validTabs = ['home', 'map', 'cctv', 'fishing', 'insights', 'cleanhouse', 'pharmacy', 'hospital', 'settings', 'stonetower'];
+      const validTabs = ['home', 'map', 'cctv', 'fishing', 'insights', 'cleanhouse', 'pharmacy', 'hospital', 'settings', 'stonetower', 'market'];
       if (validTabs.includes(tab)) {
         setActiveTab(tab);
       }
@@ -226,12 +229,39 @@ function App() {
       setShowBanner(true);
     }
 
+    // Check for first visit (Check localStorage)
+    const hasVisited = localStorage.getItem('has_visited_app_v1');
+    if (!hasVisited && !kakao) { // 카카오 인앱 브라우저에서는 권한 요청이 까다로울 수 있으므로 제외하거나 포함 가능 (일단 제외 X, 카카오에서도 시도는 해봄)
+      setTimeout(() => setShowWelcome(true), 2000); // 2초 뒤 등장
+    }
+
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
+
+  const handleWelcomeAction = async (allow) => {
+    localStorage.setItem('has_visited_app_v1', 'true');
+    setShowWelcome(false);
+
+    if (allow) {
+      // 알림 허용 시 '기상 특보' 기본 구독 시도
+      const success = await toggleWeatherAlerts(true);
+      if (success) {
+        // 성공 시 로컬스토리지에도 저장 (SettingsTab과 동기화)
+        localStorage.setItem('sub_weather_alert', 'true');
+        setActiveTab('settings'); // 설정 탭으로 이동
+      }
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem('jeju-air-theme', currentThemeId);
   }, [currentThemeId]);
+
+  const handleThemeChange = (newThemeId) => {
+    console.log(`Theme changing from ${currentThemeId} to ${newThemeId}`);
+    setCurrentThemeId(newThemeId);
+  };
+
 
   const handleInstallClick = async () => {
     if (isIOS) {
@@ -491,12 +521,14 @@ function App() {
     return () => window.removeEventListener('changeTab', handleTabChange);
   }, []);
 
-  const subscribeToAlerts = async () => {
+  const toggleWeatherAlerts = async (shouldSubscribe) => {
     try {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        alert('알림 권한이 거부되었습니다. 브라우저 설정에서 권한을 허용해주세요.');
-        return;
+      if (shouldSubscribe) {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          alert('알림 권한이 필요합니다.');
+          return false;
+        }
       }
 
       const token = await getToken(messaging, {
@@ -504,12 +536,42 @@ function App() {
       });
 
       if (token) {
-        await axios.post('/api/subscribe-alerts', { token });
-        alert('제주 기상 특보 알림 구독이 완료되었습니다! ⚠️');
+        const endpoint = shouldSubscribe ? '/api/subscribe-alerts' : '/api/unsubscribe-alerts';
+        await axios.post(endpoint, { token });
+        return true;
       }
+      return false;
     } catch (error) {
-      console.error('Subscription error:', error);
-      alert('알림 구독 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      console.error('Weather alert toggle error:', error);
+      alert('설정 변경 중 오류가 발생했습니다.');
+      return false;
+    }
+  };
+
+  const toggleMarketAlerts = async (shouldSubscribe) => {
+    try {
+      if (shouldSubscribe) {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          alert('알림 권한이 필요합니다.');
+          return false;
+        }
+      }
+
+      const token = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+      });
+
+      if (token) {
+        const endpoint = shouldSubscribe ? '/api/subscribe-market-alerts' : '/api/unsubscribe-market-alerts';
+        await axios.post(endpoint, { token });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Market alert toggle error:', error);
+      alert('설정 변경 중 오류가 발생했습니다.');
+      return false;
     }
   };
 
@@ -600,6 +662,47 @@ function App() {
           </motion.div>
         </div>
       )}
+
+      {/* Welcome Modal (Notification Permission) */}
+      <AnimatePresence>
+        {showWelcome && (
+          <div className="fixed inset-0 z-[3000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white/90 backdrop-blur-md rounded-[2rem] w-full max-w-sm p-6 shadow-2xl relative overflow-hidden text-neutral-800 border-2 border-white/50"
+            >
+              <div className="text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-emerald-400 rounded-full mx-auto mb-5 flex items-center justify-center text-4xl shadow-lg ring-4 ring-white/50">
+                  🔔
+                </div>
+                <h3 className="text-xl font-black mb-2 text-slate-800">제주 소식 받아보실래요?</h3>
+                <p className="text-slate-500 text-sm mb-6 leading-relaxed">
+                  중요한 <strong className="text-blue-600">기상 특보</strong>와<br />
+                  설레는 <strong className="text-orange-500">오일장 정보</strong>를 알려드려요!<br />
+                  <span className="text-xs text-slate-400 mt-1 block">(알림은 설정에서 언제든 끄실 수 있어요)</span>
+                </p>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleWelcomeAction(false)}
+                    className="flex-1 py-3.5 bg-slate-100 text-slate-500 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors"
+                  >
+                    괜찮아요
+                  </button>
+                  <button
+                    onClick={() => handleWelcomeAction(true)}
+                    className="flex-[1.5] py-3.5 bg-blue-600 text-white rounded-xl font-black text-sm shadow-lg shadow-blue-500/30 hover:bg-blue-700 active:scale-95 transition-all"
+                  >
+                    네, 받을래요!
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* KakaoTalk In-App Browser - 더 이상 전체 화면 블로킹 안함. 하단에 작은 배너로 대체 */}
       {isKakao && activeTab === 'home' && (
@@ -695,13 +798,18 @@ function App() {
               <PharmacyTab />
             )}
 
+            {activeTab === 'market' && (
+              <MarketTab />
+            )}
+
             {activeTab === 'settings' && (
               <SettingsTab
                 currentThemeId={currentThemeId}
-                setCurrentThemeId={setCurrentThemeId}
+                setCurrentThemeId={handleThemeChange}
                 currentTheme={currentTheme}
                 THEMES={THEMES}
-                subscribeToAlerts={subscribeToAlerts}
+                toggleWeatherAlerts={toggleWeatherAlerts}
+                toggleMarketAlerts={toggleMarketAlerts}
               />
             )}
 
@@ -865,10 +973,13 @@ function App() {
                   <span className="text-xs font-black text-amber-200">소원 돌탑</span>
                 </button>
 
-                {/* Future Features (Coming Soon) */}
-                <button className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 opacity-40 grayscale">
-                  <div className="text-3xl">🚌</div>
-                  <span className="text-xs font-medium text-white">교통(예정)</span>
+                {/* 오일장 탭 */}
+                <button
+                  onClick={() => { setActiveTab('market'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gradient-to-br from-orange-400/20 to-red-400/20 border border-orange-400/30 hover:bg-orange-400/30 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">🛒</div>
+                  <span className="text-xs font-black text-orange-200">오일장</span>
                 </button>
               </div>
             </motion.div>

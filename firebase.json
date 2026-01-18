@@ -66,6 +66,18 @@
                 "function": "getCoupangAds"
             },
             {
+                "source": "/api/unsubscribe-alerts",
+                "function": "unsubscribeFromWeatherAlerts"
+            },
+            {
+                "source": "/api/subscribe-market-alerts",
+                "function": "subscribeToMarketAlerts"
+            },
+            {
+                "source": "/api/unsubscribe-market-alerts",
+                "function": "unsubscribeFromMarketAlerts"
+            },
+            {
                 "source": "**",
                 "destination": "/index.html"
             }

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from './SEO';
 import SupportButton from './SupportButton';
+import { shareToKakao } from '../utils/share';
 
 // 제주 오일장 데이터
 const JEJU_MARKETS = [
@@ -170,6 +171,46 @@ export default function MarketTab() {
     const today = new Date();
     const todayStr = `${today.getMonth() + 1}월 ${today.getDate()}일`;
 
+    // 오늘 장날 요약 생성
+    const todayMarketNames = JEJU_MARKETS.filter(m => isMarketDay(m.days)).map(m => m.name);
+
+    const handleShareToday = () => {
+        if (todayMarketsCount > 0) {
+            shareToKakao({
+                title: `[제주바람] 오늘(${todayStr}) 오일장 정보`,
+                description: `오늘 열리는 장: ${todayMarketNames.join(', ')}`,
+                webUrl: 'https://jair-guide.web.app/?tab=market',
+                profileText: '🛒 제주 오일장',
+                items: todayMarketNames.slice(0, 4).map(name => ({
+                    item: '📍',
+                    itemOp: name
+                }))
+            });
+        } else {
+            shareToKakao({
+                title: `[제주바람] 제주 오일장 달력`,
+                description: '제주도 전역 9개 오일장 일정을 확인하세요!',
+                webUrl: 'https://jair-guide.web.app/?tab=market'
+            });
+        }
+    };
+
+    const handleShareMarket = (market, e) => {
+        e.stopPropagation();
+        const isOpen = isMarketDay(market.days);
+        shareToKakao({
+            title: `[제주바람] ${market.name}`,
+            description: `${market.description} - ${isOpen ? '오늘 장날!' : getNextMarketDay(market.days)}`,
+            webUrl: 'https://jair-guide.web.app/?tab=market',
+            profileText: `🛒 ${market.name}`,
+            items: [
+                { item: '📅 장날', itemOp: getMarketDayPattern(market.days) },
+                { item: '📍 위치', itemOp: market.location },
+                { item: '🏷️ 대표품목', itemOp: market.specialties.slice(0, 2).join(', ') },
+            ]
+        });
+    };
+
     return (
         <div className="flex-1 overflow-y-auto pt-6 px-4 pb-24 text-white z-10 scroll-smooth">
             <SEO
@@ -185,7 +226,15 @@ export default function MarketTab() {
                     <h2 className="text-3xl font-black text-white flex items-center gap-3">
                         <span className="text-4xl">🛒</span> 제주 오일장
                     </h2>
-                    <SupportButton />
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleShareToday}
+                            className="bg-[#FEE500] text-[#3C1E1E] px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 hover:brightness-105 active:scale-95 transition-all shadow-lg"
+                        >
+                            <span className="text-base">💬</span> 공유
+                        </button>
+                        <SupportButton />
+                    </div>
                 </div>
                 <p className="text-white/60 text-sm mt-1">제주 전역 9개 오일장 일정</p>
             </div>
@@ -216,8 +265,8 @@ export default function MarketTab() {
                 <button
                     onClick={() => setFilterToday(false)}
                     className={`flex-1 py-3 rounded-2xl font-bold text-sm transition-all ${!filterToday
-                            ? 'bg-white text-slate-900'
-                            : 'bg-white/10 text-white/60'
+                        ? 'bg-white text-slate-900'
+                        : 'bg-white/10 text-white/60'
                         }`}
                 >
                     전체 보기
@@ -225,8 +274,8 @@ export default function MarketTab() {
                 <button
                     onClick={() => setFilterToday(true)}
                     className={`flex-1 py-3 rounded-2xl font-bold text-sm transition-all ${filterToday
-                            ? 'bg-amber-500 text-white'
-                            : 'bg-white/10 text-white/60'
+                        ? 'bg-amber-500 text-white'
+                        : 'bg-white/10 text-white/60'
                         }`}
                 >
                     🔥 오늘 장날만
@@ -247,8 +296,8 @@ export default function MarketTab() {
                             transition={{ delay: idx * 0.05 }}
                             onClick={() => setSelectedMarket(selectedMarket === market.id ? null : market.id)}
                             className={`rounded-2xl p-4 cursor-pointer transition-all border ${isOpen
-                                    ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-amber-500/30'
-                                    : 'bg-white/5 border-white/5 hover:bg-white/10'
+                                ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-amber-500/30'
+                                : 'bg-white/5 border-white/5 hover:bg-white/10'
                                 }`}
                         >
                             <div className="flex items-center justify-between">
@@ -273,9 +322,20 @@ export default function MarketTab() {
                                     <p className={`font-bold ${isOpen ? 'text-amber-400' : 'text-white/60'}`}>
                                         {nextDay}
                                     </p>
-                                    <p className="text-white/40 text-[10px]">
-                                        {getMarketDayPattern(market.days)}
-                                    </p>
+                                    <div className="flex items-center justify-end gap-1 mt-1">
+                                        <p className="text-white/40 text-[10px] mr-1">
+                                            {getMarketDayPattern(market.days)}
+                                        </p>
+                                        <button
+                                            onClick={(e) => handleShareMarket(market, e)}
+                                            className="text-[#FEE500] hover:scale-110 transition-transform p-1"
+                                            title="카카오톡 공유"
+                                        >
+                                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.707 4.8 4.315 6.055-.188.702-.68 2.541-.777 2.928-.123.477.178.47.37.34.15-.102 2.386-1.622 3.347-2.27.575.087 1.15.132 1.745.132 4.97 0 9-3.184 9-7.115S16.97 3 12 3z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 

@@ -1,10 +1,55 @@
-import React from 'react';
-import { THEMES } from '../constants';
+import React, { useState, useEffect } from 'react';
+import { THEMES as IMPORTED_THEMES } from '../constants'; // Renamed to avoid name clash if needed, but actually we merge
 import { shareToKakao } from '../utils/share';
 
-export default function SettingsTab({ currentThemeId, setCurrentThemeId, currentTheme, subscribeToAlerts }) {
+// Toggle Switch Component
+const ToggleSwitch = ({ checked, onChange, colorClass = "bg-green-500", loading }) => (
+    <button
+        onClick={() => !loading && onChange(!checked)}
+        disabled={loading}
+        className={`w-12 h-7 rounded-full p-1 transition-colors duration-300 relative ${checked ? colorClass : 'bg-white/10'} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+    >
+        <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-300 ${checked ? 'translate-x-5' : 'translate-x-0'}`}>
+            {loading && <div className="w-full h-full rounded-full border-2 border-slate-200 border-t-slate-500 animate-spin" />}
+        </div>
+    </button>
+);
+
+export default function SettingsTab({ currentThemeId, setCurrentThemeId, currentTheme, THEMES, toggleWeatherAlerts, toggleMarketAlerts }) {
+    const [weatherAlert, setWeatherAlert] = useState(false);
+    const [marketAlert, setMarketAlert] = useState(false);
+    const [loadingWeather, setLoadingWeather] = useState(false);
+    const [loadingMarket, setLoadingMarket] = useState(false);
+
+    useEffect(() => {
+        const storedWeather = localStorage.getItem('sub_weather_alert') === 'true';
+        const storedMarket = localStorage.getItem('sub_market_alert') === 'true';
+        setWeatherAlert(storedWeather);
+        setMarketAlert(storedMarket);
+    }, []);
+
+    const handleWeatherToggle = async (checked) => {
+        setLoadingWeather(true);
+        const success = await toggleWeatherAlerts(checked);
+        if (success) {
+            setWeatherAlert(checked);
+            localStorage.setItem('sub_weather_alert', checked);
+        }
+        setLoadingWeather(false);
+    };
+
+    const handleMarketToggle = async (checked) => {
+        setLoadingMarket(true);
+        const success = await toggleMarketAlerts(checked);
+        if (success) {
+            setMarketAlert(checked);
+            localStorage.setItem('sub_market_alert', checked);
+        }
+        setLoadingMarket(false);
+    };
+
     return (
-        <div className="flex-1 overflow-y-auto p-4 text-white pb-32">
+        <div className="flex-1 overflow-y-auto p-4 text-white pb-32 pointer-events-auto">
             <h2 className="text-2xl font-black mb-1">더보기</h2>
             <p className="text-white/60 text-xs mb-8">앱 설정 및 제주바람 정보</p>
 
@@ -17,12 +62,15 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
                         <p className="text-[10px] text-white/40 font-bold">원하는 제주의 색을 입혀봅서</p>
                     </div>
                 </div>
-                <div className="grid grid-cols-4 gap-2">
-                    {Object.values(THEMES).map(theme => (
+                <div className="grid grid-cols-4 gap-2 relative z-50">
+                    {Object.values(THEMES || IMPORTED_THEMES || {}).map(theme => (
                         <button
                             key={theme.id}
-                            onClick={() => setCurrentThemeId(theme.id)}
-                            className={`flex flex-col items-center gap-2 p-2 rounded-2xl transition-all duration-300 ${currentThemeId === theme.id ? 'bg-white/20 scale-105 ring-2 ring-white/50' : 'hover:bg-white/10'}`}
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevent bubbling issues
+                                setCurrentThemeId(theme.id);
+                            }}
+                            className={`flex flex-col items-center gap-2 p-2 rounded-2xl transition-all duration-300 relative pointer-events-auto ${currentThemeId === theme.id ? 'bg-white/20 scale-105 ring-2 ring-white/50' : 'hover:bg-white/10'}`}
                         >
                             <div className={`w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-xl bg-gradient-to-br ${theme.colors.bg}`}>
                                 {theme.icon}
@@ -33,24 +81,44 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
                 </div>
             </div>
 
-            {/* Weather Alert Subscription (New) */}
+            {/* Weather Alert Subscription */}
             <div className="glass-card glass-border rounded-[2rem] p-5 mb-6 shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10 text-6xl">⚠️</div>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center text-2xl shadow-inner">🔔</div>
                         <div>
-                            <h4 className="font-black text-sm">기상 특보 푸시 알림</h4>
-                            <p className="text-[10px] text-white/40 font-bold">제주 특보 발령 시 즉시 알려드려요</p>
+                            <h4 className="font-black text-sm">기상 특보 알림</h4>
+                            <p className="text-[10px] text-white/40 font-bold">제주 특보 발령 시 알려드려요</p>
                         </div>
                     </div>
+                    <ToggleSwitch
+                        checked={weatherAlert}
+                        onChange={handleWeatherToggle}
+                        loading={loadingWeather}
+                        colorClass="bg-emerald-500"
+                    />
                 </div>
-                <button
-                    onClick={subscribeToAlerts}
-                    className="w-full mt-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl py-3 text-xs font-black transition-all active:scale-95"
-                >
-                    알림 구독하기
-                </button>
+            </div>
+
+            {/* Market Alert Subscription */}
+            <div className="glass-card glass-border rounded-[2rem] p-5 mb-6 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 text-6xl">🛒</div>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 glass-premium rounded-2xl flex items-center justify-center text-2xl shadow-inner">⏰</div>
+                        <div>
+                            <h4 className="font-black text-sm">오일장 아침 알림</h4>
+                            <p className="text-[10px] text-white/40 font-bold">장날 아침 7시에 알려드려요</p>
+                        </div>
+                    </div>
+                    <ToggleSwitch
+                        checked={marketAlert}
+                        onChange={handleMarketToggle}
+                        loading={loadingMarket}
+                        colorClass="bg-orange-500"
+                    />
+                </div>
             </div>
 
             {/* App Recommendation (New) */}
