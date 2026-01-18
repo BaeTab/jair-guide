@@ -16,9 +16,9 @@ const BackgroundMesh = ({ themeId, mainStatus }) => {
         }
 
         // Apply weather-based modifications (e.g., more gray if hazardous/rainy)
-        if (mainStatus?.type === 'hazardous' || mainStatus?.type === 'unhealthy') {
-            colors = colors.map(c => c.replace(/rgba\(\d+, \d+, \d+/, 'rgba(100, 116, 139')); // Slate-ish
-        }
+        // if (mainStatus?.type === 'hazardous' || mainStatus?.type === 'unhealthy') {
+        //     colors = colors.map(c => c.replace(/rgba\(\d+, \d+, \d+/, 'rgba(100, 116, 139')); // Slate-ish
+        // }
 
         return colors;
     }, [themeId, mainStatus]);
