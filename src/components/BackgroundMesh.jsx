@@ -7,31 +7,28 @@ const BackgroundMesh = ({ themeId, mainStatus }) => {
         // Default colors (Ocean/Clear)
         let colors = ['rgba(59, 130, 246, 0.5)', 'rgba(6, 182, 212, 0.4)', 'rgba(99, 102, 241, 0.3)'];
 
-        if (themeId === 'canola') {
+        const tid = String(themeId || '').trim();
+
+        if (tid.includes('canola')) {
             colors = ['rgba(245, 158, 11, 0.4)', 'rgba(252, 211, 77, 0.3)', 'rgba(249, 115, 22, 0.2)'];
-        } else if (themeId === 'camellia') {
+        } else if (tid.includes('camellia')) {
             colors = ['rgba(239, 68, 68, 0.4)', 'rgba(236, 72, 153, 0.3)', 'rgba(219, 39, 119, 0.2)'];
-        } else if (themeId === 'stone') {
+        } else if (tid.includes('stone')) {
             colors = ['rgba(75, 85, 99, 0.4)', 'rgba(31, 41, 55, 0.3)', 'rgba(107, 114, 128, 0.2)'];
         }
-
-        // Apply weather-based modifications (e.g., more gray if hazardous/rainy)
-        // if (mainStatus?.type === 'hazardous' || mainStatus?.type === 'unhealthy') {
-        //     colors = colors.map(c => c.replace(/rgba\(\d+, \d+, \d+/, 'rgba(100, 116, 139')); // Slate-ish
-        // }
 
         return colors;
     }, [themeId, mainStatus]);
 
     return (
-        <div className="fixed inset-0 -z-50 overflow-hidden bg-slate-950 pointer-events-none">
+        <div className="fixed inset-0 -z-50 overflow-hidden pointer-events-none">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={themeId + (mainStatus?.type || '')}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 2 }}
+                    transition={{ duration: 0.5 }}
                     className="absolute inset-0"
                 >
                     {/* Mesh Blob 1 */}

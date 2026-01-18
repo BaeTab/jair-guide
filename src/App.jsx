@@ -580,7 +580,7 @@ function App() {
 
   return (
     <motion.div
-      className="min-h-screen w-full flex flex-col transition-colors duration-1000 ease-in-out font-sans scroll-smooth relative overflow-hidden"
+      className={`min-h-screen w-full flex flex-col transition-all duration-1000 ease-in-out font-sans scroll-smooth relative overflow-hidden bg-gradient-to-br ${currentTheme.colors.bg}`}
     >
       <BackgroundMesh themeId={currentThemeId} mainStatus={mainStatus} />
       {/* Install Banner at the absolute top */}
