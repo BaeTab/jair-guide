@@ -782,6 +782,38 @@ function App() {
                 </button>
 
                 <button
+                  onClick={() => { window.open('https://myrealt.rip/T89qab', '_blank'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">🚗</div>
+                  <span className="text-xs font-medium text-white">렌터카</span>
+                </button>
+
+                <button
+                  onClick={() => { window.open('https://myrealt.rip/T8B1bc', '_blank'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">🏄</div>
+                  <span className="text-xs font-medium text-white">액티비티</span>
+                </button>
+
+                <button
+                  onClick={() => { window.open('https://myrealt.rip/T8Bk65', '_blank'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">✈️</div>
+                  <span className="text-xs font-medium text-white">항공권</span>
+                </button>
+
+                <button
+                  onClick={() => { window.open('https://myrealt.rip/T8C7fd', '_blank'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">🏨</div>
+                  <span className="text-xs font-medium text-white">숙소</span>
+                </button>
+
+                <button
                   onClick={() => { setActiveTab('stonetower'); setShowAllMenu(false); }}
                   className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-400/20 border border-amber-400/30 hover:bg-amber-400/30 active:scale-95 transition-all"
                 >
@@ -791,7 +823,7 @@ function App() {
 
                 {/* Future Features (Coming Soon) */}
                 <button className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 opacity-40 grayscale">
-                  <div className="text-3xl">🚗</div>
+                  <div className="text-3xl">🚌</div>
                   <span className="text-xs font-medium text-white">교통(예정)</span>
                 </button>
               </div>
