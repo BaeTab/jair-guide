@@ -96,7 +96,7 @@ function getBaseDateTime() {
         hour -= 1;
         if (hour < 0) {
             hour = 23;
-            baseDate = now.subtract(1, 'days').format("YYYYMMDD");
+            baseDate = moment(now).subtract(1, 'days').format("YYYYMMDD");
         }
     }
 

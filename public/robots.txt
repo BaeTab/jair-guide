@@ -1,4 +1,30 @@
+# Robots.txt for jair-guide.web.app
+# 제주가이드 - 제주도 생활/여행 종합 가이드
+
+# 모든 검색엔진 허용
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /firebase-messaging-sw.js
 
+# 구글봇 최적화 설정
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# 네이버봇 최적화 설정
+User-agent: Yeti
+Allow: /
+Crawl-delay: 1
+
+# Bing봇 설정
+User-agent: bingbot
+Allow: /
+Crawl-delay: 1
+
+# 사이트맵 위치
 Sitemap: https://jair-guide.web.app/sitemap.xml
+
+# Host 지정
+Host: https://jair-guide.web.app

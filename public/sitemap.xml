@@ -1,9 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <!-- 메인 페이지 -->
   <url>
     <loc>https://jair-guide.web.app/</loc>
-    <lastmod>2026-01-17</lastmod>
-    <changefreq>daily</changefreq>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>hourly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://jair-guide.web.app/og-image.png</image:loc>
+      <image:title>제주가이드 - 제주도 생활/여행 종합 가이드</image:title>
+    </image:image>
+  </url>
+  
+  <!-- 날씨 탭 -->
+  <url>
+    <loc>https://jair-guide.web.app/#weather</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- 낚시 정보 탭 -->
+  <url>
+    <loc>https://jair-guide.web.app/#fishing</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- 지도 탭 -->
+  <url>
+    <loc>https://jair-guide.web.app/#map</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- 클린하우스 정보 -->
+  <url>
+    <loc>https://jair-guide.web.app/#cleanhouse</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- 약국 정보 -->
+  <url>
+    <loc>https://jair-guide.web.app/#pharmacy</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- 와이파이 정보 -->
+  <url>
+    <loc>https://jair-guide.web.app/#wifi</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- 전기차 충전소 -->
+  <url>
+    <loc>https://jair-guide.web.app/#ev</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

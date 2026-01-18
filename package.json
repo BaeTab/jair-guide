@@ -17,7 +17,6 @@
     "hls.js": "^1.6.15",
     "html2canvas": "^1.4.1",
     "leaflet": "^1.9.4",
-    "mammoth": "^1.11.0",
     "moment-timezone": "^0.6.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

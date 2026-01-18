@@ -23,20 +23,6 @@ import BackgroundMesh from './components/BackgroundMesh';
 
 // --- Configuration & Constants ---
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function WeatherBackground({ weatherCode, statusType, themeColors }) {
   const [particles, setParticles] = useState([]);
 
@@ -346,14 +332,19 @@ function App() {
         appData.weatherCode
       );
 
+      // Calculate feel temperature (wind chill approximation)
+      const feelTemp = Math.round(appData.temp - (appData.windSpeed * 0.5));
+
       return {
         ...currentAir,
         temp: appData.temp,
+        feelTemp, // Added: 체감온도
+        rainAmt: 0, // Default: 현재 API에서 실시간 강수량 미제공
         weatherCode: appData.weatherCode,
         windSpeed: appData.windSpeed,
         windDirection: appData.windDirection,
         humidity: appData.humidity,
-        uvIndex: appData.uvIndex, // Pass UV Index to frontend component
+        uvIndex: appData.uvIndex,
         next6Hours: appData.hourly ? appData.hourly.slice(0, 6) : [],
         status,
         hallaIndex,
