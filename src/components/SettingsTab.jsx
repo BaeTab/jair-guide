@@ -1,5 +1,6 @@
 import React from 'react';
 import { THEMES } from '../constants';
+import { shareToKakao } from '../utils/share';
 
 export default function SettingsTab({ currentThemeId, setCurrentThemeId, currentTheme, subscribeToAlerts }) {
     return (
@@ -50,6 +51,31 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
                 >
                     알림 구독하기
                 </button>
+            </div>
+
+            {/* App Recommendation (New) */}
+            <div className="glass-card glass-border rounded-[2rem] p-5 mb-6 shadow-xl relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-purple-500/10">
+                <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-[#FEE500] rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-yellow-500/20">💬</div>
+                        <div>
+                            <h4 className="font-black text-sm">제주바람 추천하기</h4>
+                            <p className="text-[10px] text-white/40 font-bold">친구에게 실시간 제주 정보를 알려주세요!</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => {
+                            shareToKakao({
+                                title: '제주가이드 - 날씨, 낚시, 생활 정보',
+                                description: '제주 살이와 여행에 필요한 모든 정보를 실시간으로 확인하세요! 🍃',
+                                webUrl: 'https://jair-guide.web.app/?tab=home'
+                            });
+                        }}
+                        className="px-4 py-2 bg-[#FEE500] text-[#191919] rounded-xl text-[10px] font-black hover:scale-105 active:scale-95 transition-all"
+                    >
+                        카톡 공유
+                    </button>
+                </div>
             </div>
 
             <div className="space-y-4">

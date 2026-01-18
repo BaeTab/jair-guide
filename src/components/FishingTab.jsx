@@ -2,11 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import TiltCard from './TiltCard';
 import SupportButton from './SupportButton';
+import SEO from './SEO';
 import { COLORS } from '../constants';
+import { shareToKakao } from '../utils/share';
 
 export default function FishingTab({ seaTripData, seaFishingData, loading }) {
     const [filterType, setFilterType] = React.useState('ALL'); // ALL, 갯바위, 선상
-    const [filterTime, setFilterTime] = React.useState('ALL'); // ALL, 1 (오전), 2 (오후)
     const [searchFish, setSearchFish] = React.useState('');
 
     // Robustly calculate summary from regions if available
@@ -43,13 +44,56 @@ export default function FishingTab({ seaTripData, seaFishingData, loading }) {
 
     const fishingPoints = seaFishingData?.data || [];
 
-    // Filter logic
-    const filteredPoints = fishingPoints.filter(point => {
-        const pointTimeStr = String(point.time || '').trim();
+    // 장소별로 그룹화 (한 장소가 여러번 나오지 않도록)
+    const groupedPoints = React.useMemo(() => {
+        const groups = {};
+
+        fishingPoints.forEach(point => {
+            const locName = point.name;
+            if (!groups[locName]) {
+                groups[locName] = {
+                    ...point,
+                    allFish: new Set(),
+                    bestScore: point.score || 0,
+                    bestIndex: point.index,
+                    times: new Set(),
+                };
+            }
+
+            // 어종 수집
+            if (point.targetFish) {
+                point.targetFish.split(',').forEach(fish => groups[locName].allFish.add(fish.trim()));
+            }
+
+            // 시간대 수집
+            if (point.time) {
+                groups[locName].times.add(point.time === '1' ? '오전' : '오후');
+            }
+
+            // 가장 좋은 조건 유지
+            if ((point.score || 0) > groups[locName].bestScore) {
+                groups[locName].bestScore = point.score || 0;
+                groups[locName].bestIndex = point.index;
+                groups[locName].wave = point.wave;
+                groups[locName].temp = point.temp;
+            }
+        });
+
+        // Set을 배열로 변환
+        return Object.values(groups).map(g => ({
+            ...g,
+            targetFish: Array.from(g.allFish).join(', '),
+            index: g.bestIndex,
+            score: g.bestScore,
+            timeSlots: Array.from(g.times).join('/'),
+        }));
+    }, [fishingPoints]);
+
+    // Filter logic (그룹화된 데이터에 적용)
+    const filteredPoints = groupedPoints.filter(point => {
         const matchType = filterType === 'ALL' || point.type === filterType;
-        const matchTime = filterTime === 'ALL' || pointTimeStr === filterTime;
         const matchFish = !searchFish || (point.targetFish && point.targetFish.includes(searchFish));
-        return matchType && matchTime && matchFish;
+        return matchType && matchFish;
     });
 
     if (loading || (!seaTripData && !seaFishingData)) {
@@ -77,6 +121,13 @@ export default function FishingTab({ seaTripData, seaFishingData, loading }) {
 
     return (
         <div className="flex-1 overflow-y-auto pt-6 px-4 pb-24 text-white z-10 scroll-smooth bg-slate-900/50">
+            <SEO
+                title="제주 낚시 포인트 및 물때 정보"
+                description={`제주도 주요 낚시 포인트의 실시간 물때, 파고(${summaryStats.avgWave}m), 수온(${summaryStats.avgTemp}°C) 정보를 확인하세요. 벵에돔, 무늬오징어 포인트 큐레이션 제공.`}
+                keywords="제주낚시, 제주도물때, 제주낚시포인트, 벵에돔낚시, 무늬오징어포인트, 제주도바다날씨"
+                url="fishing"
+            />
+
             {/* Header */}
             <div className="mb-6">
                 <div className="flex items-center justify-between">
@@ -191,25 +242,7 @@ export default function FishingTab({ seaTripData, seaFishingData, loading }) {
                             ))}
                         </div>
 
-                        {/* Time Filter */}
-                        <div className="flex bg-white/10 p-1 rounded-xl backdrop-blur-md flex-1 sm:flex-none">
-                            {[
-                                { label: '전체', value: 'ALL' },
-                                { label: '오전', value: '1' },
-                                { label: '오후', value: '2' }
-                            ].map((t) => (
-                                <button
-                                    key={t.value}
-                                    onClick={() => setFilterTime(t.value)}
-                                    className={`flex-1 sm:px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${filterTime === t.value
-                                        ? 'bg-cyan-500 text-white shadow-lg'
-                                        : 'text-white/60 hover:text-white hover:bg-white/5'
-                                        }`}
-                                >
-                                    {t.label}
-                                </button>
-                            ))}
-                        </div>
+                        {/* 오전/오후 필터 제거됨 - 장소별 그룹화로 대체 */}
                     </div>
                 </div>
 
@@ -271,6 +304,31 @@ export default function FishingTab({ seaTripData, seaFishingData, loading }) {
                                         </div>
                                         <div className="text-right">
                                             <div className={`text-lg font-black ${conditionColor}`}>{point.index}</div>
+                                            <div className="flex items-center justify-end gap-2 mt-1">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        shareToKakao({
+                                                            title: `[제주바람] ${point.name} 낚시 정보`,
+                                                            description: `${point.targetFish || '낚시'} 포인트 - ${point.index}`,
+                                                            webUrl: 'https://jair-guide.web.app/?tab=fishing',
+                                                            profileText: `🎣 ${point.name}`,
+                                                            items: [
+                                                                { item: '📊 낚시 지수', itemOp: point.index },
+                                                                { item: '🌊 파고', itemOp: `${point.wave.max}m` },
+                                                                { item: '🌡️ 수온', itemOp: `${point.temp.max}°C` },
+                                                                { item: '🌀 물때', itemOp: point.tide },
+                                                            ]
+                                                        });
+                                                    }}
+                                                    className="text-[#FEE500] hover:scale-110 transition-transform"
+                                                    title="카카오톡 공유"
+                                                >
+                                                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.707 4.8 4.315 6.055-.188.702-.68 2.541-.777 2.928-.123.477.178.47.37.34.15-.102 2.386-1.622 3.347-2.27.575.087 1.15.132 1.745.132 4.97 0 9-3.184 9-7.115S16.97 3 12 3z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                             <div className="text-[10px] text-white/40">지수 점수 {point.score}</div>
                                         </div>
                                     </div>

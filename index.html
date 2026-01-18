@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" style="background: #1e3a5f;">
 
 <head>
   <meta charset="UTF-8" />
@@ -11,7 +11,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="제주가이드" />
   <meta name="mobile-web-app-capable" content="yes" />
-
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7450925051429508"
+    crossorigin="anonymous"></script>
   <!-- SEO & Search Engine -->
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta name="keywords"
@@ -143,10 +144,101 @@
     gtag('js', new Date());
     gtag('config', 'G-XXXXXXXXXX');
   </script>
+
+  <!-- Kakao SDK (Official 2.7.7) -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.7/kakao.min.js"
+    integrity="sha384-tJkjbtDbvoxO+diRuDtwRO9JXR7pjWnfjfRn5ePUpl7e7RJCxKCwwnfqUAdXh53p"
+    crossorigin="anonymous"></script>
 </head>
 
-<body>
-  <div id="root"></div>
+<body style="background: linear-gradient(135deg, #1e3a5f 0%, #0f1c2e 100%); margin: 0;">
+  <div id="root">
+    <!-- 로딩 중 표시 (React 로드 전) -->
+    <div id="loading-fallback" style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+      box-sizing: border-box;
+    ">
+      <div style="font-size: 48px; margin-bottom: 16px;">🍃</div>
+      <div style="font-size: 18px; font-weight: bold;">제주바람</div>
+      <div style="font-size: 12px; opacity: 0.7; margin-top: 8px;" id="loading-text">로딩 중...</div>
+
+      <!-- 카카오톡 인앱 브라우저용 안내 (3초 후 표시) -->
+      <div id="kakao-guide" style="display: none; margin-top: 24px; text-align: center;">
+        <p style="font-size: 13px; opacity: 0.8; margin-bottom: 16px;">
+          카카오톡에서는 앱이 제대로 안 열려요!<br>
+          Safari나 Chrome에서 열어주세요.
+        </p>
+        <a href="javascript:openExternal()" style="
+          display: inline-block;
+          background: #FEE500;
+          color: #3C1E1E;
+          padding: 14px 28px;
+          border-radius: 12px;
+          font-weight: bold;
+          text-decoration: none;
+          font-size: 14px;
+        ">Safari/Chrome으로 열기</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 카카오톡 인앱 브라우저 감지 및 외부 브라우저 열기
+    var isKakao = /KAKAOTALK/i.test(navigator.userAgent);
+    var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    function openExternal() {
+      var url = window.location.href;
+      if (isIOS) {
+        // iOS: Safari로 열기 시도
+        window.location.href = 'x-safari-' + url;
+      } else {
+        // Android: Chrome intent 사용
+        window.location.href = 'intent://' + url.replace(/https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end';
+      }
+    }
+
+    // 3초 후에도 React가 로드되지 않으면 안내 표시
+    setTimeout(function () {
+      var fallback = document.getElementById('loading-fallback');
+      var guide = document.getElementById('kakao-guide');
+      var loadingText = document.getElementById('loading-text');
+      if (fallback && guide) {
+        guide.style.display = 'block';
+        if (loadingText) {
+          loadingText.textContent = isKakao ? '카카오톡 브라우저 감지됨' : '로딩이 오래 걸리네요...';
+        }
+      }
+    }, 3000);
+  </script>
+
+  <noscript>
+    <div style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #1e3a5f;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    ">
+      <div style="font-size: 48px; margin-bottom: 16px;">🍃</div>
+      <h1 style="font-size: 20px;">제주바람</h1>
+      <p style="opacity: 0.7;">JavaScript를 활성화해주세요.</p>
+      <a href="https://jair-guide.web.app" style="color: #FEE500; margin-top: 20px;">Safari/Chrome에서 열기</a>
+    </div>
+  </noscript>
+
   <script type="module" src="/src/main.jsx"></script>
 
 </body>

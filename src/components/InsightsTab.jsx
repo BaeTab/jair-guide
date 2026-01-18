@@ -4,6 +4,7 @@ import DataCard from './DataCard';
 import RadarChart from './RadarChart';
 import SupportButton from './SupportButton';
 import { getWindDesc, getWeather, getPmStatus } from '../utils';
+import { shareToKakao } from '../utils/share';
 
 export default function InsightsTab({ currentData, loading }) {
     const pm10Info = currentData?.pm10 ? getPmStatus('pm10', currentData.pm10) : { text: '', color: '' };
@@ -13,7 +14,24 @@ export default function InsightsTab({ currentData, loading }) {
         <div className="flex-1 overflow-y-auto p-4 pb-32 text-white">
             <div className="flex items-center justify-between mb-1">
                 <h2 className="text-2xl font-black">상세 대기 리포트</h2>
-                <SupportButton />
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => {
+                            if (!currentData) return;
+                            shareToKakao({
+                                title: `[제주바람] 상세 대기 리포트`,
+                                description: `미세먼지 ${currentData.pm10}, 초미세 ${currentData.pm2_5}! 제주의 실시간 공기질을 확인하세요.`,
+                                webUrl: 'https://jair-guide.web.app/?tab=insights'
+                            });
+                        }}
+                        className="p-2 rounded-xl bg-[#FEE500] text-[#191919] active:scale-95 transition-all shadow-md"
+                    >
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.707 4.8 4.315 6.055-.188.702-.68 2.541-.777 2.928-.123.477.178.47.37.34.15-.102 2.386-1.622 3.347-2.27.575.087 1.15.132 1.745.132 4.97 0 9-3.184 9-7.115S16.97 3 12 3z" />
+                        </svg>
+                    </button>
+                    <SupportButton />
+                </div>
             </div>
             <p className="text-white/60 text-xs mb-8">실시간으로 분석된 제주의 공기 분석표입니다.</p>
 

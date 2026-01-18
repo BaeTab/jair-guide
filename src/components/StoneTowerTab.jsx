@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
 import { INITIAL_LOCATIONS } from '../constants';
+import { shareToKakao } from '../utils/share';
 
 export default function StoneTowerTab({ currentTheme }) {
     const [wishes, setWishes] = useState([]);
@@ -326,6 +327,20 @@ export default function StoneTowerTab({ currentTheme }) {
                                                     }`}
                                             >
                                                 {likedPosts.includes(wish.id) ? '❤️ 온기 보냄' : `🔥 온기 ${wish.warmthCount || 0}`}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    shareToKakao({
+                                                        title: `[제주 돌탑] 누구인가의 간절한 소원 🙏`,
+                                                        description: `"${wish.text}"\n${wish.regionName} 돌탑에 쌓인 따뜻한 마음을 확인해보세요.`,
+                                                        webUrl: 'https://jair-guide.web.app/?tab=stonetower'
+                                                    });
+                                                }}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-colors text-white/40"
+                                            >
+                                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.707 4.8 4.315 6.055-.188.702-.68 2.541-.777 2.928-.123.477.178.47.37.34.15-.102 2.386-1.622 3.347-2.27.575.087 1.15.132 1.745.132 4.97 0 9-3.184 9-7.115S16.97 3 12 3z" />
+                                                </svg>
                                             </button>
                                         </div>
                                     </div>

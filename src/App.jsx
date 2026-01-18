@@ -141,7 +141,42 @@ function App() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showAllMenu, setShowAllMenu] = useState(false);
   const [isVirtualMode, setIsVirtualMode] = useState(false); // 가상 여행 모드 상태
-  const [activeTab, setActiveTab] = useState('home'); // 'home', 'map', 'insights', 'settings'
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const queryTab = params.get('tab');
+    const hashTab = window.location.hash.replace('#', '');
+    const tab = queryTab || hashTab;
+    const validTabs = ['home', 'map', 'cctv', 'fishing', 'insights', 'cleanhouse', 'pharmacy', 'hospital', 'settings', 'stonetower'];
+    return validTabs.includes(tab) ? tab : 'home';
+  }); // 'home', 'map', 'insights', 'settings'
+
+  // Deep Linking Routing (Hash and Query Params)
+  useEffect(() => {
+    const handleRouting = () => {
+      const params = new URLSearchParams(window.location.search);
+      const queryTab = params.get('tab');
+      const hashTab = window.location.hash.replace('#', '');
+      const tab = queryTab || hashTab;
+
+      const validTabs = ['home', 'map', 'cctv', 'fishing', 'insights', 'cleanhouse', 'pharmacy', 'hospital', 'settings', 'stonetower'];
+      if (validTabs.includes(tab)) {
+        setActiveTab(tab);
+      }
+    };
+
+    handleRouting();
+    window.addEventListener('hashchange', handleRouting);
+    // Listen for history changes if needed, but for now hash/init is usually enough
+    return () => window.removeEventListener('hashchange', handleRouting);
+  }, []);
+
+  // Initialize Kakao SDK
+  useEffect(() => {
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init(import.meta.env.VITE_KAKAO_JS_KEY);
+      console.log('Kakao SDK Initialized');
+    }
+  }, []);
 
   // Analytics: Track screen views on tab change
   useEffect(() => {
@@ -566,55 +601,19 @@ function App() {
         </div>
       )}
 
-      {/* KakaoTalk In-App Browser Guide */}
-      {isKakao && (
-        <div className="fixed inset-0 z-[3000] flex flex-col items-center justify-center p-6 bg-emerald-600 text-white text-center">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="flex flex-col items-center max-w-sm"
+      {/* KakaoTalk In-App Browser - 더 이상 전체 화면 블로킹 안함. 하단에 작은 배너로 대체 */}
+      {isKakao && activeTab === 'home' && (
+        <div className="fixed bottom-20 left-4 right-4 z-[1000] bg-amber-500 text-white p-3 rounded-2xl shadow-2xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">💡</span>
+            <p className="text-xs font-bold">앱 설치는 Safari/Chrome에서!</p>
+          </div>
+          <button
+            onClick={() => setIsKakao(false)}
+            className="text-white/80 text-xs font-bold px-3 py-1 bg-white/20 rounded-full"
           >
-            <div className="w-24 h-24 bg-white/20 rounded-3xl flex items-center justify-center text-5xl mb-8 shadow-2xl animate-bounce">📱</div>
-            <h2 className="text-2xl font-black mb-4 leading-tight">카카오톡에서는 <br />앱 설치가 루우(어렵습니다)!</h2>
-            <p className="text-white/80 text-sm mb-10 leading-relaxed font-semibold">
-              제바람 앱을 제대로 쓰려면 <br />
-              <span className="text-yellow-300 underline font-bold">Safari(사파리)나 Chrome(크롬)</span>에서 <br />
-              열어야 설치할 수 있수다!
-            </p>
-
-            <div className="bg-white/10 p-6 rounded-3xl border border-white/20 mb-10 w-full">
-              <p className="text-xs font-bold mb-4 opacity-70">이동하는 방법</p>
-              <p className="text-sm font-black mb-2 flex items-center gap-2 justify-center">
-                <span className="bg-white text-emerald-600 w-5 h-5 rounded-full flex items-center justify-center text-[10px]">1</span>
-                우측 상단 <strong className="text-yellow-300">세로 점 세개 (⋮ 또는 ···)</strong> 터치
-              </p>
-              <p className="text-sm font-black flex items-center gap-2 justify-center">
-                <span className="bg-white text-emerald-600 w-5 h-5 rounded-full flex items-center justify-center text-[10px]">2</span>
-                <strong className="text-yellow-300">'다른 브라우저로 열기'</strong> 또는 <br /> <strong className="text-yellow-300">'Safari로 열기'</strong> 선택
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                const url = window.location.href;
-                // Common trick to force external browser for some versions of kakao
-                if (isIOS) {
-                  window.location.href = `kakaotalk://web/openExternalApp?url=${encodeURIComponent(url)}`;
-                } else {
-                  window.location.href = `intent://${url.replace(/https?:\/\//, '')}#Intent;scheme=http;package=com.android.chrome;end`;
-                }
-              }}
-              className="w-full bg-white text-emerald-600 py-4 rounded-2xl font-black shadow-xl active:scale-95 transition-all text-sm mb-4"
-            >
-              지금 바로 사파리/크롬으로 열기
-            </button>
-            <button
-              onClick={() => setIsKakao(false)}
-              className="text-white/60 text-xs underline font-bold"
-            >
-              그냥 카톡에서 볼랩니다 (닫기)
-            </button>
-          </motion.div>
+            닫기
+          </button>
         </div>
       )}
       <WeatherBackground

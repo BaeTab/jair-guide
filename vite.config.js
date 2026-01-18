@@ -12,10 +12,34 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: '제주바람 - 실시간 제주 공기 모니터',
-        short_name: '제주바람',
-        description: '제주도 실시간 공기질 및 날씨 정보',
+        name: '제주가이드 - 실시간 제주 날씨, 낚시, 생활 정보',
+        short_name: '제주가이드',
+        description: '제주도 실시간 날씨, 미세먼지, 낚시 물때, 약국, 클린하우스 등 제주 생활/여행의 모든 정보를 제공하는 종합 가이드 앱',
         theme_color: '#ffffff',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
+        lang: 'ko-KR',
+        orientation: 'portrait',
+        categories: ['travel', 'lifestyle', 'utilities'],
+        shortcuts: [
+          {
+            name: '실시간 날씨',
+            url: '/#weather',
+            icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: '낚시 포인트',
+            url: '/#fishing',
+            icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: '생활 지도',
+            url: '/#map',
+            icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
+          }
+        ],
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -37,6 +61,7 @@ export default defineConfig({
           }
         ]
       }
+
     })
   ],
   css: {

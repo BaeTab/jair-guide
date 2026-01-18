@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 import TiltCard from './TiltCard';
 import DataCard from './DataCard';
 import SupportButton from './SupportButton';
+import SEO from './SEO';
 import { getHealthTips, getStyleRecommendation, getSmartTriggers } from '../utils';
 import { JEJU_DIALECTS } from '../constants';
+import { shareToKakao } from '../utils/share';
 
 export default function HomeTab({
     setShowShareModal,
@@ -19,8 +21,31 @@ export default function HomeTab({
     airportWeather,
     coupangAds
 }) {
+
+    const handleKakaoShare = () => {
+        if (!currentData) return;
+        shareToKakao({
+            title: `[제주바람] ${selectedLoc.name} 실시간 날씨`,
+            description: `${mainStatus.text}! 제주도 날씨와 대기질 정보를 확인하세요.`,
+            webUrl: 'https://jair-guide.web.app/?tab=home',
+            profileText: `📍 ${selectedLoc.name}`,
+            items: [
+                { item: '🌡️ 현재 기온', itemOp: `${currentData.temp}°C` },
+                { item: '😷 미세먼지', itemOp: `${currentData.pm10}` },
+                { item: '💧 습도', itemOp: `${currentData.humidity}%` },
+                { item: '💨 바람', itemOp: `${currentData.windSpeed}m/s` },
+            ]
+        });
+    };
+
     return (
         <div className="flex-1 overflow-y-auto pt-6 px-4 pb-10 text-white z-10 scroll-smooth">
+            <SEO
+                title={`${selectedLoc.name} 실시간 날씨`}
+                description={`${selectedLoc.name}의 현재 기온은 ${currentData?.temp || '--'}도이며, 미세먼지는 ${currentData?.pm10 || '--'}입니다. 제주도 날씨와 여행 정보를 제주가이드에서 확인하세요.`}
+                keywords={`제주도날씨, ${selectedLoc.name}날씨, 제주여행, 미세먼지, 제주공항기상`}
+            />
+
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 opacity-90">
@@ -29,6 +54,16 @@ export default function HomeTab({
                 </div>
                 <div className="flex items-center gap-2">
                     <SupportButton />
+                    <button
+                        onClick={handleKakaoShare}
+                        className="p-2.5 rounded-2xl bg-[#FEE500] text-[#191919] active:scale-95 flex items-center gap-2 transition-all shadow-xl"
+                        title="카카오톡 공유"
+                    >
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.707 4.8 4.315 6.055-.188.702-.68 2.541-.777 2.928-.123.477.178.47.37.34.15-.102 2.386-1.622 3.347-2.27.575.087 1.15.132 1.745.132 4.97 0 9-3.184 9-7.115S16.97 3 12 3z" />
+                        </svg>
+                        <span className="text-[11px] font-black tracking-tight">카톡</span>
+                    </button>
                     <button
                         onClick={() => setShowShareModal(true)}
                         className="p-2.5 rounded-2xl glass-premium glass-border text-white active:scale-95 flex items-center gap-2 transition-all shadow-xl"

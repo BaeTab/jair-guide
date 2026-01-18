@@ -16,6 +16,10 @@ export default function NavButton({ active, onClick, icon, label, themeColor }) 
             )}
             <div className={`text-2xl mb-1 transition-transform duration-300 ${active ? 'scale-110 -translate-y-1' : ''}`} style={{ color: active ? 'white' : 'rgba(255,255,255,0.6)' }}>
                 {icon}
+                {/* 'NEW' Badge for Marketing */}
+                {!active && label === '낚시' && (
+                    <div className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border border-white/20 shadow-[0_0_8px_rgba(244,63,94,0.6)] animate-pulse"></div>
+                )}
             </div>
             <span className={`text-[10px] font-medium transition-opacity duration-300 ${active ? 'opacity-100 font-bold' : 'opacity-50'}`}>
                 {label}
