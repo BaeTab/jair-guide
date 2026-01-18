@@ -155,6 +155,8 @@ function App() {
   const [airportWeather, setAirportWeather] = useState(null);
   const [seaTripData, setSeaTripData] = useState(null);
   const [seaFishingData, setSeaFishingData] = useState(null);
+  const [coupangAds, setCoupangAds] = useState(null);
+
 
   // ...
 
@@ -374,6 +376,26 @@ function App() {
       axios.get('/api/fishing', { timeout: 30000 })
         .then(res => { if (res.data?.success !== false) setSeaFishingData(res.data); })
         .catch(e => console.warn(e));
+
+      // 🎯 Coupang Ads Keyword Rotation Logic
+      const adKeywords = [
+        '제주 감귤', '제주 특산물', '제주 한라봉', '제주도 여행', '제주 흑돼지',
+        '제주도 카페', '제주도 기념품', '한라산 기념품', '제주 갈치', '제주 마음샌드',
+        '제주 오메기떡', '제주도 렌터카', '제주 항공권', '제주도 숙소', '제주도 굿즈',
+        '제주 우산', '제주 보조배터리', '제주 등산용품', '제주 서핑', '제주도 낚시',
+        '제주 선글라스', '제주 자외선차단제', '제주 비옷', '제주 캔들', '제주 방향제'
+      ];
+
+      // Get last used index from localStorage to ensure true rotation
+      let lastIdx = parseInt(localStorage.getItem('lastAdKeywordIdx') || '-1');
+      let nextIdx = (lastIdx + 1) % adKeywords.length;
+      localStorage.setItem('lastAdKeywordIdx', nextIdx.toString());
+
+      const rotationKeyword = adKeywords[nextIdx];
+
+      axios.get('/api/ads', { params: { keyword: rotationKeyword, limit: 10 }, timeout: 10000 })
+        .then(res => { if (res.data?.data?.productData) setCoupangAds(res.data.data.productData); })
+        .catch(e => console.warn('Ads Fetch Error:', e));
 
       // 2. Prioritize Selected Location
       const currentLocData = await fetchSingleLocation(selectedLoc);
@@ -623,6 +645,7 @@ function App() {
                 currentData={currentData}
                 seaTripData={seaTripData}
                 airportWeather={airportWeather}
+                coupangAds={coupangAds}
               />
             )}
 
@@ -783,34 +806,52 @@ function App() {
 
                 <button
                   onClick={() => { window.open('https://myrealt.rip/T89qab', '_blank'); setShowAllMenu(false); }}
-                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                  className="relative flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all group border border-white/5"
                 >
-                  <div className="text-3xl filter drop-shadow-lg">🚗</div>
-                  <span className="text-xs font-medium text-white">렌터카</span>
+                  <div className="absolute -top-1.5 -right-1.5 px-2 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg text-[8px] font-black text-white shadow-lg shadow-emerald-500/20 z-10 scale-0 group-hover:scale-100 transition-transform">GO!</div>
+                  <div className="absolute top-2 right-2 px-1 py-0.5 bg-white/10 border border-white/10 rounded-[6px] text-[7px] font-black text-white/40 leading-none">REALT</div>
+                  <div className="text-3xl filter drop-shadow-lg group-hover:scale-110 transition-transform">🚗</div>
+                  <span className="text-xs font-medium text-white/80 group-hover:text-white">렌터카</span>
                 </button>
 
                 <button
                   onClick={() => { window.open('https://myrealt.rip/T8B1bc', '_blank'); setShowAllMenu(false); }}
-                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                  className="relative flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all group border border-white/5"
                 >
-                  <div className="text-3xl filter drop-shadow-lg">🏄</div>
-                  <span className="text-xs font-medium text-white">액티비티</span>
+                  <div className="absolute -top-1.5 -right-1.5 px-2 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg text-[8px] font-black text-white shadow-lg shadow-emerald-500/20 z-10 scale-0 group-hover:scale-100 transition-transform">GO!</div>
+                  <div className="absolute top-2 right-2 px-1 py-0.5 bg-white/10 border border-white/10 rounded-[6px] text-[7px] font-black text-white/40 leading-none">REALT</div>
+                  <div className="text-3xl filter drop-shadow-lg group-hover:scale-110 transition-transform">🏄</div>
+                  <span className="text-xs font-medium text-white/80 group-hover:text-white">액티비티</span>
                 </button>
 
                 <button
                   onClick={() => { window.open('https://myrealt.rip/T8Bk65', '_blank'); setShowAllMenu(false); }}
-                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                  className="relative flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all group border border-white/5"
                 >
-                  <div className="text-3xl filter drop-shadow-lg">✈️</div>
-                  <span className="text-xs font-medium text-white">항공권</span>
+                  <div className="absolute -top-1.5 -right-1.5 px-2 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg text-[8px] font-black text-white shadow-lg shadow-emerald-500/20 z-10 scale-0 group-hover:scale-100 transition-transform">GO!</div>
+                  <div className="absolute top-2 right-2 px-1 py-0.5 bg-white/10 border border-white/10 rounded-[6px] text-[7px] font-black text-white/40 leading-none">REALT</div>
+                  <div className="text-3xl filter drop-shadow-lg group-hover:scale-110 transition-transform">✈️</div>
+                  <span className="text-xs font-medium text-white/80 group-hover:text-white">항공권</span>
                 </button>
 
                 <button
                   onClick={() => { window.open('https://myrealt.rip/T8C7fd', '_blank'); setShowAllMenu(false); }}
-                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                  className="relative flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all group border border-white/5"
                 >
-                  <div className="text-3xl filter drop-shadow-lg">🏨</div>
-                  <span className="text-xs font-medium text-white">숙소</span>
+                  <div className="absolute -top-1.5 -right-1.5 px-2 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg text-[8px] font-black text-white shadow-lg shadow-emerald-500/20 z-10 scale-0 group-hover:scale-100 transition-transform">GO!</div>
+                  <div className="absolute top-2 right-2 px-1 py-0.5 bg-white/10 border border-white/10 rounded-[6px] text-[7px] font-black text-white/40 leading-none">REALT</div>
+                  <div className="text-3xl filter drop-shadow-lg group-hover:scale-110 transition-transform">🏨</div>
+                  <span className="text-xs font-medium text-white/80 group-hover:text-white">숙소</span>
+                </button>
+
+                <button
+                  onClick={() => { window.open('https://link.coupang.com/a/duDnnA', '_blank'); setShowAllMenu(false); }}
+                  className="relative flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all group border border-white/5"
+                >
+                  <div className="absolute -top-1.5 -right-1.5 px-2 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg text-[8px] font-black text-white shadow-lg shadow-orange-500/20 z-10 scale-0 group-hover:scale-100 transition-transform">HOT!</div>
+                  <div className="absolute top-2 right-2 px-1 py-0.5 bg-white/10 border border-white/10 rounded-[6px] text-[7px] font-black text-white/40 leading-none">PANG</div>
+                  <div className="text-3xl filter drop-shadow-lg group-hover:scale-110 transition-transform">☕</div>
+                  <span className="text-xs font-medium text-white/80 group-hover:text-white">카페</span>
                 </button>
 
                 <button

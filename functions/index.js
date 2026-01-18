@@ -5,6 +5,8 @@ const axios = require("axios");
 const cors = require("cors")({ origin: true });
 const moment = require("moment-timezone");
 const proj4 = require("proj4");
+const crypto = require("crypto");
+
 
 // Load environment variables from .env file
 require("dotenv").config();
@@ -1322,6 +1324,52 @@ exports.sendTestAlert = functions.https.onRequest((req, res) => {
         } catch (error) {
             console.error("Test Notification Error:", error);
             return res.status(500).json({ error: error.message });
+        }
+    });
+});
+
+// Coupang Partners API Proxy
+exports.getCoupangAds = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const ACCESS_KEY = process.env.ACCESS_KEY || "1380871b-e7f7-41ef-9994-171fd278d99c";
+            const SECRET_KEY = process.env.SECRET_KEY || "7b28f5a8c04ada24a1eb515a4d2dc7e2c0bf8e20";
+
+            if (!ACCESS_KEY || !SECRET_KEY) {
+                return res.status(500).json({ error: "Coupang API keys missing" });
+            }
+
+            const keyword = req.query.keyword || "제주도";
+            const limit = req.query.limit || 10;
+            const method = "GET";
+            const path = "/v2/providers/affiliate_open_api/apis/openapi/products/search";
+            const query = `keyword=${encodeURIComponent(keyword)}&limit=${limit}`;
+
+            // Generate HMAC Signature
+            const now = new Date();
+            const datetime = now.toISOString().slice(2, 10).replace(/-/g, '') + 'T' +
+                now.toISOString().slice(11, 19).replace(/:/g, '') + 'Z';
+
+            const message = datetime + method + path + query;
+            const signature = crypto.createHmac("sha256", SECRET_KEY.trim()).update(message).digest("hex");
+            const authorization = `CEA algorithm=HmacSHA256, access-key=${ACCESS_KEY.trim()}, signed-date=${datetime}, signature=${signature}`;
+
+            const url = `https://api-gateway.coupang.com${path}?${query}`;
+
+            const response = await axios.get(url, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": authorization
+                },
+                timeout: 10000
+            });
+
+            res.status(200).json(response.data);
+        } catch (error) {
+            console.error("Coupang API Error:", error.message);
+            const status = error.response ? error.response.status : 500;
+            const details = error.response ? error.response.data : error.message;
+            res.status(status).json({ error: "ADS_FETCH_ERROR", status, details });
         }
     });
 });

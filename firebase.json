@@ -62,6 +62,10 @@
                 "function": "getHospital"
             },
             {
+                "source": "/api/ads",
+                "function": "getCoupangAds"
+            },
+            {
                 "source": "**",
                 "destination": "/index.html"
             }

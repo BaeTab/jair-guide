@@ -16,7 +16,8 @@ export default function HomeTab({
     mainStatus,
     currentData,
     seaTripData,
-    airportWeather
+    airportWeather,
+    coupangAds
 }) {
     return (
         <div className="flex-1 overflow-y-auto pt-6 px-4 pb-10 text-white z-10 scroll-smooth">
@@ -183,7 +184,7 @@ export default function HomeTab({
             {/* Lifestyle Index Grid (New Feature) */}
             <div className="mb-8">
                 <h3 className="text-xs font-black text-white/50 mb-4 px-1 uppercase tracking-widest">오늘의 생활 지수</h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 mb-6">
                     {currentData?.lifestyle && [
                         currentData.lifestyle.laundry,
                         currentData.lifestyle.carwash,
@@ -204,6 +205,60 @@ export default function HomeTab({
                         </TiltCard>
                     ))}
                 </div>
+
+                {/* Coupang Recommendations Section */}
+                {coupangAds && coupangAds.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-2"
+                    >
+                        <div className="flex items-center justify-between mb-4 px-1">
+                            <h3 className="text-xs font-black text-white/50 uppercase tracking-widest flex items-center gap-2">
+                                <span className="w-5 h-5 bg-orange-500 rounded-md flex items-center justify-center text-[10px] text-white">C</span>
+                                제주 실속 쇼핑 큐레이션
+                            </h3>
+                            <span className="text-[8px] text-white/30 font-bold uppercase tracking-tighter border border-white/10 px-1.5 py-0.5 rounded">AD</span>
+                        </div>
+                        <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 snap-x">
+                            {coupangAds.map((product, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => window.open(product.productUrl, '_blank')}
+                                    className="flex-shrink-0 w-44 glass-card glass-border rounded-3xl p-3 snap-start relative group"
+                                >
+                                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-3">
+                                        <img
+                                            src={product.productImage}
+                                            alt={product.productName}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                        />
+                                        <div className="absolute top-2 right-2 bg-orange-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-lg shadow-lg">
+                                            COUPANG
+                                        </div>
+                                    </div>
+                                    <div className="px-1">
+                                        <h4 className="text-[11px] font-bold text-white/90 line-clamp-2 leading-tight mb-2 h-7">
+                                            {product.productName}
+                                        </h4>
+                                        <div className="flex items-end justify-between">
+                                            <div className="text-sm font-black text-orange-400">
+                                                {product.productPrice.toLocaleString()}원
+                                            </div>
+                                            <div className="text-[8px] text-white/40 font-bold">무료배송</div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                        <div className="px-1 mt-2">
+                            <p className="text-[8px] text-white/20 leading-tight italic font-medium">
+                                ※ 이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
             </div>
 
             {/* Data Summary Grid */}
