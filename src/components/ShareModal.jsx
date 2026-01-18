@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
+import { trackShare } from '../analytics';
 
 export default function ShareModal({ isOpen, onClose, data, mainStatus, weather, themeColors }) {
     const cardRef = useRef(null);
@@ -29,6 +29,10 @@ export default function ShareModal({ isOpen, onClose, data, mainStatus, weather,
                 link.click();
                 document.body.removeChild(link); // Clean up
                 URL.revokeObjectURL(url); // Free memory
+
+                // Analytics: Track share/download action
+                trackShare('image_download', data.locationName);
+
                 onClose();
             }, 'image/png');
         } catch (e) {

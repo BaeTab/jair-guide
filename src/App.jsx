@@ -6,6 +6,7 @@ import { getToken } from 'firebase/messaging';
 import { logEvent } from 'firebase/analytics';
 import { INITIAL_LOCATIONS, COLORS, MESSAGES, THEMES } from './constants';
 import { getWeather, getStatus, getTravelIndex, calculateHallaIndex, getJejuActivity, getLifestyleTips, calculateRadarStats } from './utils';
+import { logEvent as logAnalyticsEvent, trackPageView, trackFeatureUse } from './analytics';
 import ShareModal from './components/ShareModal';
 import NavButton from './components/NavButton';
 
@@ -144,12 +145,15 @@ function App() {
 
   // Analytics: Track screen views on tab change
   useEffect(() => {
+    // 1. Firebase Analytics (Legacy/Existing)
     if (analytics) {
       logEvent(analytics, 'screen_view', {
         firebase_screen: activeTab,
         screen_name: activeTab
       });
     }
+    // 2. Custom GA4 Wrapper
+    trackPageView(activeTab);
   }, [activeTab]);
   const [currentThemeId, setCurrentThemeId] = useState(localStorage.getItem('jeju-air-theme') || 'ocean');
   const [airportWeather, setAirportWeather] = useState(null);

@@ -279,3 +279,54 @@ export const getStyleRecommendation = (temp, windSpeed, humidity) => {
 
     return { hair, outfit };
 };
+
+export const getSmartTriggers = (currentData, seaFishingData) => {
+    const triggers = [];
+
+    // 1. Stargazing / Galaxy (은하시)
+    if (currentData.weatherCode <= 1 && currentData.pm10 < 30) {
+        triggers.push({
+            id: 'star',
+            icon: '🌌',
+            title: '오늘 밤 은하수 샤워!',
+            desc: '하늘이 맑고 공기도 깨끗해 별 보기 최고우다.',
+            color: 'from-indigo-600 to-purple-600'
+        });
+    }
+
+    // 2. Halla View (한라산 뷰)
+    if (currentData.hallaIndex && currentData.hallaIndex.score > 85) {
+        triggers.push({
+            id: 'halla',
+            icon: '🏔️',
+            title: '지금 한라산이 부릅니다',
+            desc: '가시거리가 하영 좋아 백록담이 눈앞에 보염!',
+            color: 'from-emerald-500 to-sky-500'
+        });
+    }
+
+    // 3. Laundry Peak (세차/빨래 호재)
+    if (currentData.lifestyle && currentData.lifestyle.laundry.score === 3 && currentData.lifestyle.carwash.score === 3) {
+        triggers.push({
+            id: 'cleaning',
+            icon: '✨',
+            title: '밀린 빨래/세차 끝내기',
+            desc: '햇볕 좋고 먼지도 없어 뽀송뽀송하게 말립서.',
+            color: 'from-orange-400 to-pink-500'
+        });
+    }
+
+    // 4. Fishing Gold (반짝 낚시 찬스)
+    // Simple check on seaFishingData if exists
+    if (seaFishingData && seaFishingData.some && seaFishingData.some(f => f.index === '좋음')) {
+        triggers.push({
+            id: 'fishing',
+            icon: '🎣',
+            title: '입질이 온다! 낚시 찬스',
+            desc: '바다가 잔잔하고 물때도 좋아 손맛 보기 딱이우다.',
+            color: 'from-blue-500 to-cyan-500'
+        });
+    }
+
+    return triggers;
+};

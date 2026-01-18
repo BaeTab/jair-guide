@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import TiltCard from './TiltCard';
 import DataCard from './DataCard';
 import SupportButton from './SupportButton';
-import { getHealthTips, getStyleRecommendation } from '../utils';
+import { getHealthTips, getStyleRecommendation, getSmartTriggers } from '../utils';
 import { JEJU_DIALECTS } from '../constants';
 
 export default function HomeTab({
@@ -68,6 +68,37 @@ export default function HomeTab({
                     </svg>
                 </button>
             </div>
+
+            {/* Smart Trigger Banner (Marketing) */}
+            {currentData && (
+                <div className="mb-6 space-y-3">
+                    {getSmartTriggers(currentData, []).map(trigger => (
+                        <motion.div
+                            key={trigger.id}
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            className={`p-1 rounded-[2rem] bg-gradient-to-r ${trigger.color} shadow-lg`}
+                        >
+                            <div className="bg-black/20 backdrop-blur-md rounded-[1.9rem] p-4 flex items-center gap-4">
+                                <span className="text-3xl animate-bounce-slow">{trigger.icon}</span>
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-black text-white mb-0.5">{trigger.title}</h4>
+                                    <p className="text-[10px] text-white/80 font-medium">{trigger.desc}</p>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        if (trigger.id === 'fishing') window.dispatchEvent(new CustomEvent('changeTab', { detail: 'fishing' }));
+                                        if (trigger.id === 'star' || trigger.id === 'halla') setShowShareModal(true);
+                                    }}
+                                    className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full text-[9px] font-black transition-all"
+                                >
+                                    자세히
+                                </button>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            )}
 
             {/* Status Section */}
             <div className="mt-2 mb-8 flex flex-col items-center relative">
