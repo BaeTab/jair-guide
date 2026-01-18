@@ -1188,6 +1188,46 @@ exports.getPharmacy = functions.https.onRequest((req, res) => {
     });
 });
 
+// Jeju Hospital API Proxy
+exports.getHospital = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            const { number = 1, limit = 100 } = req.query;
+            const projectKey = "tbb1D1a1559at91ababaata1abtba58a"; // Provided by user
+            const apiUrl = `https://open.jejudatahub.net/api/proxy/${projectKey}/4343_o3b3o8r23o0jcb32r53b3cet082`; // Using the existing project key from pharmacy? No, checking logic.
+            // Wait, the user provided a full URL structure: https://open.jejudatahub.net/api/proxy/tbb1D1a1559at91ababaata1abtba58a/{your_projectKey}
+            // The guid in the middle seems to be the dataset ID.
+            // Let's look at the pharmacy implementation: `https://open.jejudatahub.net/api/proxy/taD8a8t1atabta1Dtt1tta6bt16ab16a/${projectKey}`
+            // The projectKey variable in pharmacy was "4343_o3b3o8r23o0jcb32r53b3cet082".
+            // The User's prompt says: https://open.jejudatahub.net/api/proxy/tbb1D1a1559at91ababaata1abtba58a/{your_projectKey}
+            // So 'tbb1D1a1559at91ababaata1abtba58a' is the DATASET ID.
+            // The project key should probably be the same one we used for Pharmacy if it's the same user account, OR we might need a new one.
+            // Let's assume the user meant to reuse the project key "4343_o3b3o8r23o0jcb32r53b3cet082" which is likely their personal key.
+
+            const userProjectKey = "4343_o3b3o8r23o0jcb32r53b3cet082";
+            const datasetId = "tbb1D1a1559at91ababaata1abtba58a";
+            const url = `https://open.jejudatahub.net/api/proxy/${datasetId}/${userProjectKey}`;
+
+            const response = await axios.get(url, {
+                params: {
+                    number: number,
+                    limit: limit
+                },
+                timeout: 10000
+            });
+
+            res.status(200).json(response.data);
+        } catch (error) {
+            console.error("Hospital API Error:", error.message);
+            if (error.response) {
+                console.error("Error Data:", JSON.stringify(error.response.data));
+                console.error("Error Status:", error.response.status);
+            }
+            res.status(500).json({ error: "Failed to fetch Hospital data", details: error.message });
+        }
+    });
+});
+
 // Jeju Public Wifi API Proxy
 // Scheduled function to check for Jeju Weather Alerts every 30 minutes
 exports.checkJejuWeatherAlerts = onSchedule('every 30 minutes', async (event) => {

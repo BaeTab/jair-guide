@@ -18,6 +18,7 @@ const CctvTab = React.lazy(() => import('./components/CctvTab'));
 const CleanHouseTab = React.lazy(() => import('./components/CleanHouseTab'));
 const PharmacyTab = React.lazy(() => import('./components/PharmacyTab'));
 const StoneTowerTab = React.lazy(() => import('./components/StoneTowerTab'));
+const HospitalTab = React.lazy(() => import('./components/HospitalTab'));
 import BackgroundMesh from './components/BackgroundMesh';
 
 // --- Configuration & Constants ---
@@ -634,6 +635,7 @@ function App() {
               />
             )}
 
+            {activeTab === 'hospital' && <HospitalTab />}
             {activeTab === 'map' && (
               <MapTab
                 locations={locations}
@@ -778,6 +780,14 @@ function App() {
                 >
                   <div className="text-3xl filter drop-shadow-lg">💊</div>
                   <span className="text-xs font-medium text-white">약국</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveTab('hospital'); setShowAllMenu(false); }}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all"
+                >
+                  <div className="text-3xl filter drop-shadow-lg">🏥</div>
+                  <span className="text-xs font-medium text-white">병원</span>
                 </button>
 
                 <button

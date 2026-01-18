@@ -58,6 +58,10 @@
                 "function": "sendTestAlert"
             },
             {
+                "source": "/api/hospital",
+                "function": "getHospital"
+            },
+            {
                 "source": "**",
                 "destination": "/index.html"
             }

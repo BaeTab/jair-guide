@@ -108,6 +108,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api\/subscribe-alerts/, '/subscribeToWeatherAlerts')
+      },
+      '/api/hospital': {
+        target: 'https://us-central1-jair-guide.cloudfunctions.net',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/hospital/, '/getHospital')
       }
     }
   }
