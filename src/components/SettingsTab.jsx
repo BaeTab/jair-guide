@@ -15,7 +15,16 @@ const ToggleSwitch = ({ checked, onChange, colorClass = "bg-green-500", loading 
     </button>
 );
 
-export default function SettingsTab({ currentThemeId, setCurrentThemeId, currentTheme, THEMES, toggleWeatherAlerts, toggleMarketAlerts }) {
+export default function SettingsTab({
+    currentThemeId,
+    setCurrentThemeId,
+    currentTheme,
+    THEMES,
+    toggleWeatherAlerts,
+    toggleMarketAlerts,
+    handleInstallClick,
+    isStandalone
+}) {
     const [weatherAlert, setWeatherAlert] = useState(false);
     const [marketAlert, setMarketAlert] = useState(false);
     const [loadingWeather, setLoadingWeather] = useState(false);
@@ -30,20 +39,24 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
 
     const handleWeatherToggle = async (checked) => {
         setLoadingWeather(true);
-        const success = await toggleWeatherAlerts(checked);
-        if (success) {
-            setWeatherAlert(checked);
-            localStorage.setItem('sub_weather_alert', checked);
+        if (toggleWeatherAlerts) {
+            const success = await toggleWeatherAlerts(checked);
+            if (success) {
+                setWeatherAlert(checked);
+                localStorage.setItem('sub_weather_alert', checked);
+            }
         }
         setLoadingWeather(false);
     };
 
     const handleMarketToggle = async (checked) => {
         setLoadingMarket(true);
-        const success = await toggleMarketAlerts(checked);
-        if (success) {
-            setMarketAlert(checked);
-            localStorage.setItem('sub_market_alert', checked);
+        if (toggleMarketAlerts) {
+            const success = await toggleMarketAlerts(checked);
+            if (success) {
+                setMarketAlert(checked);
+                localStorage.setItem('sub_market_alert', checked);
+            }
         }
         setLoadingMarket(false);
     };
@@ -52,6 +65,28 @@ export default function SettingsTab({ currentThemeId, setCurrentThemeId, current
         <div className="flex-1 overflow-y-auto p-4 text-white pb-32 pointer-events-auto">
             <h2 className="text-2xl font-black mb-1">더보기</h2>
             <p className="text-white/60 text-xs mb-8">앱 설정 및 제주바람 정보</p>
+
+            {/* PWA Install Promotion (Strengthened) */}
+            {!isStandalone && (
+                <div className="glass-card glass-border rounded-[2rem] p-5 mb-6 shadow-xl relative overflow-hidden bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-emerald-500/30">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 text-6xl">📱</div>
+                    <div className="flex items-center justify-between gap-4 relative z-10">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20">🍃</div>
+                            <div>
+                                <h4 className="font-black text-sm">홈 화면에 추가</h4>
+                                <p className="text-[10px] text-white/60 font-medium leading-tight">앱처럼 쓰면 더 빨라요!</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={handleInstallClick}
+                            className="px-4 py-2.5 bg-white text-emerald-600 rounded-xl text-xs font-black shadow-lg hover:scale-105 active:scale-95 transition-all"
+                        >
+                            지금 앱으로 설치
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Theme Switcher */}
             <div className="glass-card glass-border rounded-3xl p-5 mb-6 shadow-xl">

@@ -586,29 +586,40 @@ function App() {
       {/* Install Banner at the absolute top */}
       {showBanner && activeTab === 'home' && (
         <motion.div
-          initial={{ y: -100 }}
-          animate={{ y: 0 }}
-          className="w-full bg-white text-emerald-600 py-3 px-6 flex justify-between items-center z-[1000] sticky top-0 shadow-2xl border-b-2 border-emerald-100"
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="w-full px-4 pt-4 z-[1000] sticky top-0"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-xl shadow-inner">🍃</div>
-            <div>
-              <h4 className="text-sm font-black leading-tight">제주바람 앱 설치하기</h4>
-              <p className="text-[10px] opacity-80 font-medium tracking-tight whitespace-nowrap">{isIOS ? "아이폰 설치 방법을 확인하세요" : "더 빠르고 편리하게 확인하세요!"}</p>
+          <div className="glass-premium glass-border rounded-[2rem] p-4 flex justify-between items-center shadow-2xl border border-white/20 backdrop-blur-3xl">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20">
+                🍃
+              </div>
+              <div>
+                <h4 className="text-sm font-black text-white leading-tight">제주바람 바로가기</h4>
+                <p className="text-[10px] text-white/60 font-medium tracking-tight whitespace-nowrap">바탕화면에 추가하고 실시간 제주 날씨 확인!</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleInstallClick}
-              className="bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-emerald-200 active:scale-95 transition-all"
-            >
-              {isIOS ? "방법 보기" : "설치"}
-            </button>
-            <button onClick={() => setShowBanner(false)} className="p-2 text-emerald-300">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleInstallClick}
+                className="bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-emerald-500/30 active:scale-95 transition-all"
+              >
+                {isIOS ? "방법" : "추가"}
+              </button>
+              <button
+                onClick={() => {
+                  setShowBanner(false);
+                  localStorage.setItem('pwa-banner-dismissed', 'true');
+                  localStorage.setItem('pwa-banner-dismiss-time', new Date().getTime().toString());
+                }}
+                className="p-2 text-white/30 hover:text-white/60 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                </svg>
+              </button>
+            </div>
           </div>
         </motion.div>
       )}
@@ -810,6 +821,8 @@ function App() {
                 THEMES={THEMES}
                 toggleWeatherAlerts={toggleWeatherAlerts}
                 toggleMarketAlerts={toggleMarketAlerts}
+                handleInstallClick={handleInstallClick}
+                isStandalone={isStandalone}
               />
             )}
 

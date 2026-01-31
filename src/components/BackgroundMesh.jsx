@@ -10,18 +10,18 @@ const BackgroundMesh = ({ themeId, mainStatus }) => {
         const tid = String(themeId || '').trim();
 
         if (tid.includes('canola')) {
-            colors = ['rgba(245, 158, 11, 0.4)', 'rgba(252, 211, 77, 0.3)', 'rgba(249, 115, 22, 0.2)'];
+            colors = ['rgba(245, 158, 11, 0.8)', 'rgba(252, 211, 77, 0.6)', 'rgba(249, 115, 22, 0.5)'];
         } else if (tid.includes('camellia')) {
-            colors = ['rgba(239, 68, 68, 0.4)', 'rgba(236, 72, 153, 0.3)', 'rgba(219, 39, 119, 0.2)'];
+            colors = ['rgba(239, 68, 68, 0.8)', 'rgba(236, 72, 153, 0.6)', 'rgba(219, 39, 119, 0.5)'];
         } else if (tid.includes('stone')) {
-            colors = ['rgba(75, 85, 99, 0.4)', 'rgba(31, 41, 55, 0.3)', 'rgba(107, 114, 128, 0.2)'];
+            colors = ['rgba(75, 85, 99, 0.8)', 'rgba(31, 41, 55, 0.7)', 'rgba(107, 114, 128, 0.6)'];
         }
 
         return colors;
     }, [themeId, mainStatus]);
 
     return (
-        <div className="fixed inset-0 -z-50 overflow-hidden pointer-events-none">
+        <div className="fixed inset-0 -z-50 overflow-hidden pointer-events-none transition-all duration-1000">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={themeId + (mainStatus?.type || '')}

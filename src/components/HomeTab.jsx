@@ -38,8 +38,29 @@ export default function HomeTab({
         });
     };
 
+    const [showDialectUsage, setShowDialectUsage] = React.useState(false);
+    const dialectIndex = new Date().getDate() % JEJU_DIALECTS.length;
+    const currentDialect = JEJU_DIALECTS[dialectIndex];
+
+    const handleSpeakDialect = (e) => {
+        e.stopPropagation();
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(currentDialect.word);
+        msg.lang = 'ko-KR';
+        msg.rate = 0.8;
+        window.speechSynthesis.speak(msg);
+    };
+
+    const handleCopyDialect = (e) => {
+        e.stopPropagation();
+        const text = `[제주바람 오늘의 제주말]\n"${currentDialect.word}" : ${currentDialect.mean}\n예문: ${currentDialect.usage}`;
+        navigator.clipboard.writeText(text);
+        alert('문장이 복사되었습니다! 🍊');
+    };
+
     return (
-        <div className="flex-1 overflow-y-auto pt-6 px-4 pb-10 text-white z-10 scroll-smooth">
+        <div className="flex-1 overflow-y-auto pt-4 px-4 pb-4 text-white z-10 scroll-smooth">
             <SEO
                 title={`${selectedLoc.name} 실시간 날씨`}
                 description={`${selectedLoc.name}의 현재 기온은 ${currentData?.temp || '--'}도이며, 미세먼지는 ${currentData?.pm10 || '--'}입니다. 제주도 날씨와 여행 정보를 제주가이드에서 확인하세요.`}
@@ -77,7 +98,7 @@ export default function HomeTab({
                 </div>
             </div>
 
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex justify-between items-start mb-4">
                 <div>
                     <div className="flex items-center gap-2 text-white">
                         <h2 className="text-3xl font-bold drop-shadow-md">{selectedLoc.name}</h2>
@@ -106,7 +127,7 @@ export default function HomeTab({
 
             {/* Smart Trigger Banner (Marketing) */}
             {currentData && (
-                <div className="mb-6 space-y-3">
+                <div className="mb-4 space-y-2">
                     {getSmartTriggers(currentData, []).map(trigger => (
                         <motion.div
                             key={trigger.id}
@@ -136,7 +157,7 @@ export default function HomeTab({
             )}
 
             {/* Status Section */}
-            <div className="mt-2 mb-8 flex flex-col items-center relative">
+            <div className="mt-2 mb-4 flex flex-col items-center relative">
                 <motion.div
                     className="w-32 h-32 mb-4 text-white filter drop-shadow-[0_0_30px_rgba(255,255,255,0.4)]"
                     key={mainStatus.text}
@@ -146,7 +167,7 @@ export default function HomeTab({
                     {mainStatus.icon}
                 </motion.div>
                 <h1 className="text-5xl font-bold mb-1 tracking-tight drop-shadow-lg text-center">{mainStatus.text}</h1>
-                <p className="text-xl text-white/90 font-medium text-center opacity-90 mb-6">{mainStatus.sub}</p>
+                <p className="text-xl text-white/90 font-medium text-center opacity-90 mb-4">{mainStatus.sub}</p>
                 <div className="flex gap-3 justify-center flex-wrap">
                     {getHealthTips(mainStatus.type).map((tip, idx) => (
                         <div key={idx} className="glass-card glass-border px-4 py-2 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-lg text-white">
@@ -159,7 +180,7 @@ export default function HomeTab({
 
             {/* Realtime Weather Bar */}
             {currentData && (
-                <div className="mb-8 grid grid-cols-3 gap-3 px-2">
+                <div className="mb-4 grid grid-cols-3 gap-3 px-2">
                     <div className="glass-card glass-border rounded-2xl p-3 flex flex-col items-center justify-center text-center shadow-lg">
                         <span className="text-2xl mb-1 drop-shadow-sm">🌡️</span>
                         <span className="text-[10px] text-white/50 font-bold mb-0.5">기온</span>
@@ -190,7 +211,7 @@ export default function HomeTab({
 
             {/* OOTD & Hair Style Card (New Feature) */}
             {currentData && (
-                <div className="mb-6">
+                <div className="mb-4">
                     <TiltCard className="mb-0">
                         <div className="glass-card glass-border rounded-[2rem] p-5 shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-4 opacity-10 text-6xl">👕</div>
@@ -248,9 +269,9 @@ export default function HomeTab({
             )}
 
             {/* Lifestyle Index Grid (New Feature) */}
-            <div className="mb-8">
-                <h3 className="text-xs font-black text-white/50 mb-4 px-1 uppercase tracking-widest">오늘의 생활 지수</h3>
-                <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="mb-4">
+                <h3 className="text-xs font-black text-white/50 mb-3 px-1 uppercase tracking-widest">오늘의 생활 지수</h3>
+                <div className="grid grid-cols-2 gap-3 mb-4">
                     {currentData?.lifestyle && [
                         currentData.lifestyle.laundry,
                         currentData.lifestyle.carwash,
@@ -328,7 +349,7 @@ export default function HomeTab({
             </div>
 
             {/* Data Summary Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-2 gap-4 mb-4">
                 <TiltCard>
                     <DataCard
                         label="테마 추천"
@@ -351,7 +372,7 @@ export default function HomeTab({
 
             {/* Jeju Travel Index Section - Enhanced with Sea Trip Data */}
             {currentData?.travelIndex && (
-                <div className="mb-6">
+                <div className="mb-4">
                     <div className="flex items-center gap-2 mb-3 px-1 opacity-80">
                         <span className="text-lg">🚦</span>
                         <span className="text-xs font-bold uppercase tracking-widest">제주 여행/안전 지수</span>
@@ -444,7 +465,7 @@ export default function HomeTab({
 
             {/* Jeju Airport Weather Card */}
             {airportWeather?.data && (
-                <div className="mb-6">
+                <div className="mb-4">
                     <TiltCard>
                         <div className="glass-card glass-border rounded-[2rem] p-5 shadow-2xl relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-sky-400/20 to-transparent pointer-events-none"></div>
@@ -500,7 +521,7 @@ export default function HomeTab({
             )}
 
             {/* Stone Tower Call-to-action */}
-            <div className="mb-6">
+            <div className="mb-4">
                 <TiltCard className="mb-0">
                     <button
                         onClick={() => {
@@ -511,7 +532,7 @@ export default function HomeTab({
                             // Actually, I should check if I should pass setActiveTab to HomeTab.
                             window.dispatchEvent(new CustomEvent('changeTab', { detail: 'stonetower' }));
                         }}
-                        className="w-full glass-card glass-border rounded-[2.5rem] p-6 flex flex-col shadow-2xl overflow-hidden relative min-h-[140px] justify-center text-left"
+                        className="w-full glass-card glass-border rounded-[2.5rem] p-5 flex flex-col shadow-2xl overflow-hidden relative text-left"
                     >
                         <div className="absolute inset-0 bg-gradient-to-br from-amber-400/20 to-transparent pointer-events-none"></div>
                         <div className="flex flex-col gap-2 relative z-10">
@@ -535,20 +556,85 @@ export default function HomeTab({
 
             {/* Dialect Card */}
             <TiltCard className="mb-0">
-                <div className="glass-card glass-border rounded-[2.5rem] p-6 flex flex-col shadow-2xl overflow-hidden relative min-h-[140px] justify-center">
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-transparent pointer-events-none"></div>
-                    <div className="flex flex-col gap-2 relative z-10">
-                        <div className="flex items-center gap-3">
-                            <span className="text-3xl">🗿</span>
-                            <span className="text-[10px] font-black text-white/50 uppercase tracking-widest">오늘의 제주말</span>
+                <div className="glass-card glass-border rounded-[2rem] p-4 flex flex-col shadow-2xl overflow-hidden relative group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 to-transparent pointer-events-none"></div>
+
+                    <div className="flex flex-col gap-3 relative z-10">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="text-3xl">🗿</span>
+                                <div>
+                                    <span className="text-[10px] font-black text-white/50 uppercase tracking-widest block">제주말 정복하기</span>
+                                    <h4 className="text-white font-black text-xs">오늘의 제주말</h4>
+                                </div>
+                            </div>
+                            <button
+                                onClick={handleSpeakDialect}
+                                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 active:scale-90 transition-all shadow-inner border border-white/5"
+                                title="발음 듣기"
+                            >
+                                <span className="text-lg">🔊</span>
+                            </button>
                         </div>
+
                         <div>
-                            <p className="text-2xl font-black tracking-tight text-white">
-                                "{JEJU_DIALECTS[new Date().getDate() % JEJU_DIALECTS.length].word}"
+                            <div className="flex items-baseline gap-3 mb-1">
+                                <h3 className="text-4xl font-black tracking-tighter text-white">
+                                    "{currentDialect.word}"
+                                </h3>
+                                <span className="px-2 py-0.5 bg-orange-500/20 rounded-lg text-[10px] font-black text-orange-200 border border-orange-500/30">
+                                    {dialectIndex + 1}번째 단어
+                                </span>
+                            </div>
+                            <p className="text-orange-300 text-lg font-bold">
+                                ➔ {currentDialect.mean}
                             </p>
-                            <p className="text-white/60 text-sm font-medium mt-1">
-                                어떵 하느냐? ➔ {JEJU_DIALECTS[new Date().getDate() % JEJU_DIALECTS.length].mean}
-                            </p>
+                        </div>
+
+                        <div className={`mt-2 ${showDialectUsage ? 'pt-4 border-t border-white/10' : ''}`}>
+                            <div className={`transition-all duration-500 overflow-hidden ${showDialectUsage ? 'max-h-32 opacity-100 mb-3' : 'max-h-0 opacity-0'}`}>
+                                <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
+                                    <p className="text-xs text-white/40 font-bold mb-1 uppercase tracking-tighter">실제 활용 예시</p>
+                                    <p className="text-sm text-white/90 font-medium italic leading-relaxed">
+                                        "{currentDialect.usage}"
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <button
+                                    onClick={() => setShowDialectUsage(!showDialectUsage)}
+                                    className="text-[11px] font-black text-white/30 hover:text-white/60 transition-colors flex items-center gap-1.5"
+                                >
+                                    {showDialectUsage ? '예문 접기' : '어떻게 쓰나요?'}
+                                    <span className={`transform transition-transform duration-300 ${showDialectUsage ? 'rotate-180' : ''}`}>▼</span>
+                                </button>
+
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleCopyDialect}
+                                        className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-[10px] font-black text-white/50 transition-all active:scale-95"
+                                    >
+                                        복사
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            shareToKakao({
+                                                title: `오늘의 제주말: "${currentDialect.word}"`,
+                                                description: `뜻: ${currentDialect.mean}`,
+                                                webUrl: 'https://jair-guide.web.app/?tab=home',
+                                                profileText: '🗿 제주바람 실시간 가이드',
+                                                items: [
+                                                    { item: '활용 예시', itemOp: currentDialect.usage }
+                                                ]
+                                            });
+                                        }}
+                                        className="px-3 py-1.5 rounded-xl bg-[#FEE500] hover:bg-[#FEE500]/90 text-[10px] font-black text-[#191919] transition-all active:scale-95 shadow-lg shadow-yellow-500/20"
+                                    >
+                                        카톡 공유
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
