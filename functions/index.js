@@ -195,20 +195,7 @@ exports.getJejuTide = functions.https.onRequest((req, res) => {
     });
 });
 
-exports.subscribeToWeatherAlerts = functions.https.onRequest((req, res) => {
-    cors(req, res, async () => {
-        try {
-            const { token } = req.body;
-            if (!token) return res.status(400).json({ error: "Token required" });
-
-            await admin.messaging().subscribeToTopic(token, 'jeju-weather-alerts');
-            return res.status(200).json({ success: true, message: "Subscribed to jeju-weather-alerts" });
-        } catch (error) {
-            console.error("Subscription Error:", error);
-            return res.status(500).json({ error: error.message });
-        }
-    });
-});
+// subscribeToWeatherAlerts 함수는 파일 하단에 정의됨 (중복 방지)
 
 exports.getReverseGeocode = functions.https.onRequest((req, res) => {
     cors(req, res, async () => {
@@ -1492,22 +1479,27 @@ exports.checkWeatherAlerts = onSchedule({
 
         console.log(`[Weather Alert] Found ${alerts.length} weather alerts.`);
 
-        // Firestore에서 이미 발송한 특보 ID 확인
+        // Firestore에서 이미 발송한 특보 확인 (최근 6시간 내 동일 유형 알림 확인)
         const db = admin.firestore();
         const sentAlertsRef = db.collection('sent_weather_alerts');
 
         for (const alert of alerts) {
-            // 고유 ID 생성 (날짜 + 시간 + 유형 조합, 같은 시간대 중복 방지)
-            const hourKey = now.format('YYYYMMDDHH');
-            const alertId = `${hourKey}_${alert.type}`;
-            const docRef = sentAlertsRef.doc(alertId);
+            // 최근 6시간 내 같은 유형의 알림이 발송되었는지 확인
+            const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+            const recentAlertsSnap = await sentAlertsRef
+                .where('type', '==', alert.type)
+                .where('sentAt', '>', sixHoursAgo)
+                .limit(1)
+                .get();
 
-            // 이미 발송했는지 확인
-            const doc = await docRef.get();
-            if (doc.exists) {
-                console.log(`[Weather Alert] Already sent this hour: ${alertId}`);
+            if (!recentAlertsSnap.empty) {
+                console.log(`[Weather Alert] Already sent '${alert.type}' alert within 6 hours. Skipping.`);
                 continue;
             }
+
+            // 고유 ID 생성 (타임스탬프 기반)
+            const alertId = `${now.format('YYYYMMDD_HHmmss')}_${alert.type}`;
+            const docRef = sentAlertsRef.doc(alertId);
 
             const message = {
                 notification: {
