@@ -78,6 +78,10 @@
                 "function": "unsubscribeFromMarketAlerts"
             },
             {
+                "source": "/api/check-weather-alerts",
+                "function": "manualCheckWeatherAlerts"
+            },
+            {
                 "source": "**",
                 "destination": "/index.html"
             }

@@ -1376,6 +1376,288 @@ exports.getCoupangAds = functions.https.onRequest((req, res) => {
 
 // --- Jeju 5-Day Market Notification Scheduler ---
 
+// --- Weather Alert Scheduler (기상 특보 자동 알림) ---
+
+/**
+ * 30분마다 실행되어 기상 상태를 체크하고
+ * 제주 지역에 극한 기상 조건이 감지되면 푸시 알림을 발송합니다.
+ * - Open-Meteo API 사용 (무료, API 키 불필요)
+ * - 강풍(10m/s+), 폭우, 폭염(33°C+), 한파(-5°C 이하) 등 감지
+ * 중복 알림 방지를 위해 Firestore에 발송 이력을 저장합니다.
+ */
+exports.checkWeatherAlerts = onSchedule({
+    schedule: "every 30 minutes",
+    timeZone: "Asia/Seoul",
+}, async (event) => {
+    try {
+        console.log("[Weather Alert] Starting weather alert check...");
+
+        // 제주도 중심 좌표
+        const JEJU_LAT = 33.4996;
+        const JEJU_LON = 126.5312;
+
+        // Open-Meteo Current Weather API (무료, API 키 불필요)
+        const url = `https://api.open-meteo.com/v1/forecast`;
+
+        const now = moment().tz("Asia/Seoul");
+
+        const response = await axios.get(url, {
+            params: {
+                latitude: JEJU_LAT,
+                longitude: JEJU_LON,
+                current: 'temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m',
+                timezone: 'Asia/Seoul'
+            },
+            timeout: 15000
+        });
+
+        const current = response.data.current;
+        if (!current) {
+            console.log("[Weather Alert] No current weather data.");
+            return null;
+        }
+
+        console.log("[Weather Alert] Current weather:", JSON.stringify(current));
+
+        // 극한 기상 조건 체크
+        const alerts = [];
+        const temp = current.temperature_2m;
+        const windSpeed = current.wind_speed_10m;
+        const windGusts = current.wind_gusts_10m;
+        const precipitation = current.precipitation;
+        const weatherCode = current.weather_code;
+        const humidity = current.relative_humidity_2m;
+
+        // 폭염 (33°C 이상)
+        if (temp >= 33) {
+            alerts.push({
+                type: 'heat',
+                emoji: '🌡️',
+                title: '폭염 주의보',
+                body: `현재 기온 ${temp}°C! 야외 활동을 자제하고 수분을 충분히 섭취하세요.`,
+                severity: temp >= 35 ? 'warning' : 'advisory'
+            });
+        }
+
+        // 한파 (-5°C 이하)
+        if (temp <= -5) {
+            alerts.push({
+                type: 'cold',
+                emoji: '🥶',
+                title: '한파 주의보',
+                body: `현재 기온 ${temp}°C! 동파와 저체온증에 주의하세요.`,
+                severity: temp <= -10 ? 'warning' : 'advisory'
+            });
+        }
+
+        // 강풍 (풍속 10m/s 이상 또는 돌풍 15m/s 이상)
+        if (windSpeed >= 10 || windGusts >= 15) {
+            const severeWind = windSpeed >= 14 || windGusts >= 20;
+            alerts.push({
+                type: 'wind',
+                emoji: '💨',
+                title: severeWind ? '강풍 경보' : '강풍 주의보',
+                body: `현재 풍속 ${windSpeed}m/s (돌풍 ${windGusts}m/s)! 야외 활동과 항공편에 영향이 있을 수 있습니다.`,
+                severity: severeWind ? 'warning' : 'advisory'
+            });
+        }
+
+        // 폭우 (시간당 10mm 이상)
+        if (precipitation >= 10) {
+            alerts.push({
+                type: 'rain',
+                emoji: '🌧️',
+                title: precipitation >= 30 ? '호우 경보' : '호우 주의보',
+                body: `현재 강수량 ${precipitation}mm/h! 저지대 침수와 도로 통제에 주의하세요.`,
+                severity: precipitation >= 30 ? 'warning' : 'advisory'
+            });
+        }
+
+        // 위험 기상 코드 (WMO)
+        // 95-99: 뇌우, 80-82: 소나기
+        if (weatherCode >= 95) {
+            alerts.push({
+                type: 'thunderstorm',
+                emoji: '⛈️',
+                title: '뇌우 경보',
+                body: '현재 뇌우가 발생 중입니다! 실외 활동을 자제하고 안전한 곳으로 대피하세요.',
+                severity: 'warning'
+            });
+        }
+
+        if (alerts.length === 0) {
+            console.log("[Weather Alert] No extreme weather conditions detected.");
+            return null;
+        }
+
+        console.log(`[Weather Alert] Found ${alerts.length} weather alerts.`);
+
+        // Firestore에서 이미 발송한 특보 ID 확인
+        const db = admin.firestore();
+        const sentAlertsRef = db.collection('sent_weather_alerts');
+
+        for (const alert of alerts) {
+            // 고유 ID 생성 (날짜 + 시간 + 유형 조합, 같은 시간대 중복 방지)
+            const hourKey = now.format('YYYYMMDDHH');
+            const alertId = `${hourKey}_${alert.type}`;
+            const docRef = sentAlertsRef.doc(alertId);
+
+            // 이미 발송했는지 확인
+            const doc = await docRef.get();
+            if (doc.exists) {
+                console.log(`[Weather Alert] Already sent this hour: ${alertId}`);
+                continue;
+            }
+
+            const message = {
+                notification: {
+                    title: `${alert.emoji} ${alert.title}`,
+                    body: alert.body,
+                },
+                topic: 'jeju-weather-alerts',
+                webpush: {
+                    fcm_options: {
+                        link: 'https://jair-guide.web.app/?tab=home'
+                    }
+                },
+                android: {
+                    priority: 'high',
+                    notification: {
+                        channelId: 'weather_alerts',
+                        priority: 'max',
+                        defaultSound: true
+                    }
+                }
+            };
+
+            try {
+                const sendResult = await admin.messaging().send(message);
+                console.log(`[Weather Alert] Sent notification: ${sendResult}`);
+                console.log(`[Weather Alert] Title: ${alert.title}`);
+
+                // Firestore에 발송 기록 저장 (중복 방지)
+                await docRef.set({
+                    alertId: alertId,
+                    type: alert.type,
+                    title: alert.title,
+                    body: alert.body,
+                    severity: alert.severity,
+                    sentAt: admin.firestore.FieldValue.serverTimestamp(),
+                    weatherData: {
+                        temp,
+                        windSpeed,
+                        windGusts,
+                        precipitation,
+                        weatherCode
+                    }
+                });
+
+                console.log(`[Weather Alert] Saved to Firestore: ${alertId}`);
+
+            } catch (sendError) {
+                console.error(`[Weather Alert] Send Error:`, sendError.message);
+            }
+        }
+
+        return null;
+
+    } catch (error) {
+        console.error("[Weather Alert] Error:", error);
+
+        // API 오류 상세 로깅
+        if (error.response) {
+            console.error("[Weather Alert] API Response Status:", error.response.status);
+            console.error("[Weather Alert] API Response Data:", JSON.stringify(error.response.data).substring(0, 500));
+        }
+
+        return null;
+    }
+});
+
+/**
+ * 기상 특보 수동 체크 API (개발/테스트용)
+ * GET /api/check-weather-alerts
+ */
+exports.manualCheckWeatherAlerts = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+        try {
+            console.log("[Manual Weather Alert] Starting manual check...");
+
+            // 제주도 중심 좌표
+            const JEJU_LAT = 33.4996;
+            const JEJU_LON = 126.5312;
+
+            const now = moment().tz("Asia/Seoul");
+
+            // Open-Meteo API 호출
+            const response = await axios.get('https://api.open-meteo.com/v1/forecast', {
+                params: {
+                    latitude: JEJU_LAT,
+                    longitude: JEJU_LON,
+                    current: 'temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m',
+                    timezone: 'Asia/Seoul'
+                },
+                timeout: 15000
+            });
+
+            const current = response.data.current;
+
+            // 극한 기상 조건 체크
+            const alerts = [];
+            const temp = current?.temperature_2m;
+            const windSpeed = current?.wind_speed_10m;
+            const windGusts = current?.wind_gusts_10m;
+            const precipitation = current?.precipitation;
+            const weatherCode = current?.weather_code;
+
+            if (temp >= 33) alerts.push({ type: 'heat', title: '폭염 주의보', value: temp });
+            if (temp <= -5) alerts.push({ type: 'cold', title: '한파 주의보', value: temp });
+            if (windSpeed >= 10 || windGusts >= 15) alerts.push({ type: 'wind', title: '강풍 주의보', value: windSpeed });
+            if (precipitation >= 10) alerts.push({ type: 'rain', title: '호우 주의보', value: precipitation });
+            if (weatherCode >= 95) alerts.push({ type: 'thunderstorm', title: '뇌우 경보', value: weatherCode });
+
+            // 발송 이력 조회
+            const db = admin.firestore();
+            const sentAlertsSnap = await db.collection('sent_weather_alerts')
+                .orderBy('sentAt', 'desc')
+                .limit(10)
+                .get();
+
+            const sentAlerts = [];
+            sentAlertsSnap.forEach(doc => sentAlerts.push({ id: doc.id, ...doc.data() }));
+
+            return res.status(200).json({
+                success: true,
+                timestamp: now.format('YYYY-MM-DD HH:mm:ss'),
+                currentWeather: {
+                    temperature: temp,
+                    windSpeed: windSpeed,
+                    windGusts: windGusts,
+                    precipitation: precipitation,
+                    weatherCode: weatherCode,
+                    humidity: current?.relative_humidity_2m
+                },
+                detectedAlerts: alerts,
+                alertCount: alerts.length,
+                recentSentAlerts: sentAlerts.map(a => ({
+                    id: a.id,
+                    type: a.type,
+                    title: a.title,
+                    sentAt: a.sentAt?.toDate?.()
+                }))
+            });
+
+        } catch (error) {
+            console.error("[Manual Weather Alert] Error:", error);
+            return res.status(500).json({
+                error: error.message,
+                details: error.response?.data
+            });
+        }
+    });
+});
+
+
 // 제주 오일장 데이터 (Functions용)
 const MARKET_DATA = [
     { name: '대정오일시장', days: [1, 6] },
