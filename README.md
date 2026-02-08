@@ -118,7 +118,7 @@ airguide/
 
 ### 사전 요구사항
 - Node.js 18+
-- npm 또는 yarn
+- pnpm (필수)
 - Firebase CLI
 
 ### 설치
@@ -129,10 +129,10 @@ git clone https://github.com/your-username/airguide.git
 cd airguide
 
 # 의존성 설치
-npm install
+pnpm install
 
 # 개발 서버 실행
-npm run dev
+pnpm run dev
 ```
 
 ### 환경 변수 설정
@@ -149,10 +149,10 @@ VITE_FIREBASE_PROJECT_ID=your_project_id
 
 ```bash
 # 프론트엔드 빌드 및 배포
-npm run deploy
+pnpm run deploy
 
 # Cloud Functions 배포
-cd functions && npm run deploy
+cd functions && pnpm run deploy
 ```
 
 ---
